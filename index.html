@@ -635,7 +635,7 @@ function showPage(page){
     else if(page==='feedback-history'){renderFeedbackHistory();}
     else if(page==='projects'){loadProjects();}
     else if(page==='risks'){loadRisks();}
-    else if(page==='admin'){if(currentUser&&currentUser.is_admin){if(allUsers.length)renderAdminUsers();loadAllUsers();}}
+    else if(page==='admin'){document.getElementById('adminUsersList').innerHTML='<p class="p-4 text-sm">Loading users ('+allUsers.length+' cached)...</p>';if(currentUser&&currentUser.is_admin){loadAllUsers();}}
     else{renderAll();}
 }
 function setOwnerFilter(owner){currentOwnerFilter=owner;document.querySelectorAll('.nav-item').forEach(n=>{if(n.id.startsWith('nav-')&&!['nav-feedback','nav-feedback-history','nav-board','nav-list','nav-people','nav-summary'].includes(n.id))n.classList.remove('active');});document.getElementById('nav-'+(owner==='all'?'all':owner)).classList.add('active');renderAll();}
