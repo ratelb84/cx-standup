@@ -365,7 +365,7 @@ function renderCard(item){
         +'</div></div>'
         +'<div class="card-action">'+item.action+'</div>'
         +(dueHtml?'<div class="mb-2">'+dueHtml+'</div>':'')
-        +'<div class="card-meta">'+statusBadge(item.status)+ownersHtml+((item.comments&&item.comments.length)?'<span class="badge badge-gray">💬 '+item.comments.length+'</span>':'')+'</div>'
+        +'<div class="card-meta">'+statusBadge(item.status)+ownersHtml+((item.comments&&item.comments.length)?'<span class="badge badge-gray">💬 '+item.comments.length+'</span>':'')+'<span class="badge badge-gray" style="font-size:9px">📌 '+new Date(item.createdAt).toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'})+'</span>'+'</div>'
         +'</div>';
 }
 
