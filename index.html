@@ -59,6 +59,11 @@
         .due-overdue{background:#fef2f2;color:#dc2626}
         .due-soon{background:#fffbeb;color:#d97706}
         .due-ok{background:#f3f4f6;color:#6b7280}
+        .comment-list{max-height:200px;overflow-y:auto;margin-bottom:8px}
+        .comment-item{padding:8px 10px;border-left:3px solid #e5e7eb;margin-bottom:6px;background:#f9fafb;border-radius:0 6px 6px 0}
+        .comment-item .comment-meta{font-size:10px;color:#9ca3af;margin-bottom:2px}
+        .comment-item .comment-text{font-size:12px;color:#374151;line-height:1.4}
+        .comment-add{display:flex;gap:6px;align-items:flex-start}
     </style>
 </head>
 <body class="min-h-screen font-sans antialiased text-gray-900">
@@ -138,6 +143,14 @@
                 <div><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Due Date</label><input type="date" id="f_dueDate" class="input-field w-full"></div>
             </div>
             <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Owners (click to select multiple)</label><div id="f_owners" class="flex flex-wrap gap-2"></div></div>
+            <div class="mb-3" id="commentsSection" style="display:none">
+                <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Comments</label>
+                <div id="commentsList" class="comment-list"></div>
+                <div class="comment-add">
+                    <input type="text" id="f_newComment" class="input-field flex-1" placeholder="Add a comment..." onkeydown="if(event.key==='Enter'){event.preventDefault();addComment();}">
+                    <button type="button" class="btn btn-accent text-xs" onclick="addComment()" style="padding:7px 12px">Add</button>
+                </div>
+            </div>
             <button type="submit" class="btn btn-accent w-full justify-center"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span id="modalSubmitText">Add Item</span></button>
         </form>
     </div></div>
@@ -198,6 +211,7 @@ async function loadItems(){
         id:r.id,item:r.item,action:r.action,priority:r.priority,
         owner:r.owner,owners:r.owners||[r.owner],
         status:r.status,dueDate:r.due_date||null,
+        comments:r.comments||[],
         sortOrder:r.sort_order||0,createdAt:r.created_at
     }));
     renderAll();
@@ -207,6 +221,7 @@ async function upsertItem(item){
         owner:item.owners&&item.owners.length?item.owners[0]:item.owner,
         owners:item.owners||[item.owner],
         status:item.status,due_date:item.dueDate||null,
+        comments:item.comments||[],
         sort_order:item.sortOrder||0,updated_at:new Date().toISOString()};
     const{error}=await sb.from('cx_standup_items').upsert(row);
     if(error)console.error('Upsert error:',error);
@@ -245,6 +260,8 @@ function openAddModal(priority){
     document.getElementById('f_priority').value=priority||'High';
     document.getElementById('f_status').value='Open';
     document.getElementById('f_dueDate').value='';
+    document.getElementById('commentsSection').style.display='none';
+    document.getElementById('commentsList').innerHTML='';
     renderOwnerChips();
     setSelectedOwners(currentUser?[currentUser.display_name]:['Don']);
     document.getElementById('modalTitle').textContent='Add New Item';
@@ -260,6 +277,8 @@ function openEditModal(id){
     document.getElementById('f_priority').value=item.priority;
     document.getElementById('f_status').value=item.status;
     document.getElementById('f_dueDate').value=item.dueDate||'';
+    document.getElementById('commentsSection').style.display='block';
+    renderComments(item.comments||[]);
     renderOwnerChips();
     setSelectedOwners(item.owners||[item.owner]);
     document.getElementById('modalTitle').textContent='Edit Item';
@@ -269,13 +288,42 @@ function openEditModal(id){
 }
 function closeModal(){document.getElementById('modal').classList.add('hidden');}
 
+function renderComments(comments){
+    const list=document.getElementById('commentsList');
+    if(!comments||!comments.length){list.innerHTML='<p class="text-xs text-gray-400 py-2">No comments yet.</p>';return;}
+    list.innerHTML=comments.slice().reverse().map(c=>{
+        const d=new Date(c.date);
+        const dateStr=d.toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'})+' '+d.toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'});
+        const who=c.author||'Unknown';
+        const col=OWNER_COLORS[who]||'#6b7280';
+        return '<div class="comment-item"><div class="comment-meta"><span style="color:'+col+';font-weight:600">'+who+'</span> · '+dateStr+'</div><div class="comment-text">'+c.text+'</div></div>';
+    }).join('');
+    list.scrollTop=0;
+}
+
+function addComment(){
+    const input=document.getElementById('f_newComment');
+    const text=input.value.trim();
+    if(!text)return;
+    const id=document.getElementById('f_id').value;
+    if(!id)return;
+    const item=items.find(i=>i.id===id);
+    if(!item)return;
+    const comment={text:text,author:currentUser?currentUser.display_name:'Unknown',date:new Date().toISOString()};
+    if(!item.comments)item.comments=[];
+    item.comments.push(comment);
+    renderComments(item.comments);
+    input.value='';
+    upsertItem(item);
+}
+
 async function saveItem(e){
     e.preventDefault();
     if(selectedOwners.length===0){alert('Please select at least one owner');return;}
     const id=document.getElementById('f_id').value;
     const data={item:document.getElementById('f_item').value.trim(),action:document.getElementById('f_action').value.trim(),priority:document.getElementById('f_priority').value,owners:selectedOwners,owner:selectedOwners[0],status:document.getElementById('f_status').value,dueDate:document.getElementById('f_dueDate').value||null};
     if(id){const existing=items.find(i=>i.id===id);await upsertItem({...existing,...data});}
-    else{await upsertItem({id:Date.now().toString(),...data,sortOrder:0,createdAt:new Date().toISOString()});}
+    else{await upsertItem({id:Date.now().toString(),...data,comments:[],sortOrder:0,createdAt:new Date().toISOString()});}
     closeModal();await loadItems();
 }
 async function deleteItem(id){if(!confirm('Delete this item?'))return;await removeItem(id);await loadItems();}
@@ -317,7 +365,7 @@ function renderCard(item){
         +'</div></div>'
         +'<div class="card-action">'+item.action+'</div>'
         +(dueHtml?'<div class="mb-2">'+dueHtml+'</div>':'')
-        +'<div class="card-meta">'+statusBadge(item.status)+ownersHtml+'</div>'
+        +'<div class="card-meta">'+statusBadge(item.status)+ownersHtml+((item.comments&&item.comments.length)?'<span class="badge badge-gray">💬 '+item.comments.length+'</span>':'')+'</div>'
         +'</div>';
 }
 
