@@ -56,17 +56,27 @@
         .owner-chip.selected{border-color:var(--chip-color);background:color-mix(in srgb,var(--chip-color) 12%,white);color:var(--chip-color);font-weight:600}
         .owner-chip .chip-dot{width:8px;height:8px;border-radius:50%}
         .due-badge{font-size:10px;font-weight:500;padding:2px 7px;border-radius:4px}
-        .due-overdue{background:#fef2f2;color:#dc2626}
-        .due-soon{background:#fffbeb;color:#d97706}
-        .due-ok{background:#f3f4f6;color:#6b7280}
+        .due-overdue{background:#fef2f2;color:#dc2626}.due-soon{background:#fffbeb;color:#d97706}.due-ok{background:#f3f4f6;color:#6b7280}
         .comment-list{max-height:200px;overflow-y:auto;margin-bottom:8px}
         .comment-item{padding:8px 10px;border-left:3px solid #e5e7eb;margin-bottom:6px;background:#f9fafb;border-radius:0 6px 6px 0}
         .comment-item .comment-meta{font-size:10px;color:#9ca3af;margin-bottom:2px}
         .comment-item .comment-text{font-size:12px;color:#374151;line-height:1.4}
         .comment-add{display:flex;gap:6px;align-items:flex-start}
+        .nav-section{color:rgba(255,255,255,0.35);font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:12px 16px 4px;margin-top:4px}
+        .fb-card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:16px 20px;margin-bottom:12px;cursor:pointer;transition:all .15s}
+        .fb-card:hover{box-shadow:0 2px 8px rgba(0,0,0,0.06);border-color:#c7d2fe}
+        .fb-section{margin-bottom:16px}
+        .fb-section h4{font-size:12px;font-weight:600;color:#374151;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+        .fb-section textarea{width:100%;min-height:80px}
+        .fb-section .fb-content{font-size:12px;color:#4b5563;line-height:1.6;white-space:pre-wrap;padding:8px 12px;background:#f9fafb;border-radius:6px;min-height:40px}
+        .week-nav{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+        .week-nav button{background:#fff;border:1px solid #d1d5db;border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;transition:all .15s;font-family:inherit}
+        .week-nav button:hover{border-color:#6366f1;color:#6366f1}
+        .week-label{font-size:14px;font-weight:600;color:#111827;min-width:200px;text-align:center}
     </style>
 </head>
 <body class="min-h-screen font-sans antialiased text-gray-900">
+<!-- LOGIN -->
 <div id="loginScreen" class="login-bg min-h-screen flex items-center justify-center">
     <div class="card p-8 w-full max-w-sm">
         <div class="text-center mb-6">
@@ -82,16 +92,20 @@
         </form>
     </div>
 </div>
+<!-- MAIN -->
 <div id="mainApp" class="hidden"><div class="flex min-h-screen">
     <nav class="sidebar w-60 flex flex-col flex-shrink-0 min-h-screen">
         <div class="px-4 py-5 border-b border-white/10 flex items-center justify-center"><img src="logo-dark.png" alt="Ignition CX" style="height:28px;filter:brightness(0) invert(1)"></div>
-        <div class="flex-1 py-4 space-y-0.5">
-            <div class="px-4 pb-1"><p class="text-[10px] font-semibold uppercase tracking-wider text-gray-500">Views</p></div>
-            <div onclick="showPage('board')" class="nav-item active" id="nav-board"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125z"/></svg>Priority Board</div>
+        <div class="flex-1 py-4 space-y-0.5 overflow-y-auto scroll-area">
+            <div class="nav-section">📋 Weekly Feedback</div>
+            <div onclick="showPage('feedback')" class="nav-item active" id="nav-feedback"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>This Week</div>
+            <div onclick="showPage('feedback-history')" class="nav-item" id="nav-feedback-history"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>History</div>
+            <div class="nav-section">⚡ Action Items</div>
+            <div onclick="showPage('board')" class="nav-item" id="nav-board"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125z"/></svg>Priority Board</div>
             <div onclick="showPage('list')" class="nav-item" id="nav-list"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>List View</div>
             <div onclick="showPage('people')" class="nav-item" id="nav-people"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>By Person</div>
             <div onclick="showPage('summary')" class="nav-item" id="nav-summary"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>Summary</div>
-            <div class="px-4 pt-5 pb-1"><p class="text-[10px] font-semibold uppercase tracking-wider text-gray-500">Filter by Owner</p></div>
+            <div class="nav-section">Filter by Owner</div>
             <div onclick="setOwnerFilter('all')" class="nav-item active" id="nav-all"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>All</div>
             <div onclick="setOwnerFilter('Don')" class="nav-item" id="nav-Don"><span class="inline-block w-2.5 h-2.5 rounded-full ml-0.5 mr-1" style="background:#f97316"></span>Don</div>
             <div onclick="setOwnerFilter('Mark')" class="nav-item" id="nav-Mark"><span class="inline-block w-2.5 h-2.5 rounded-full ml-0.5 mr-1" style="background:#3b82f6"></span>Mark</div>
@@ -103,11 +117,26 @@
             <div onclick="setOwnerFilter('Greg')" class="nav-item" id="nav-Greg"><span class="inline-block w-2.5 h-2.5 rounded-full ml-0.5 mr-1" style="background:#84cc16"></span>Greg</div>
             <div onclick="setOwnerFilter('Verona')" class="nav-item" id="nav-Verona"><span class="inline-block w-2.5 h-2.5 rounded-full ml-0.5 mr-1" style="background:#a855f7"></span>Verona</div>
         </div>
-        <div class="px-4 py-3 border-t border-white/10"><div class="flex items-center justify-between"><p class="text-[10px] text-gray-500">CX Standup v1.0</p><button onclick="handleLogout()" class="text-[10px] text-gray-500 hover:text-red-400 cursor-pointer">Logout</button></div></div>
+        <div class="px-4 py-3 border-t border-white/10"><div class="flex items-center justify-between"><p class="text-[10px] text-gray-500">CX Standup v2.0</p><button onclick="handleLogout()" class="text-[10px] text-gray-500 hover:text-red-400 cursor-pointer">Logout</button></div></div>
     </nav>
     <main class="flex-1 overflow-y-auto scroll-area">
-        <div class="topbar flex items-center justify-between px-8 py-3 sticky top-0 z-10"><h2 class="text-sm font-semibold text-gray-800">CX Standup</h2><div class="flex items-center gap-4"><button class="btn btn-accent text-xs" onclick="openAddModal()"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Add Item</button><div class="h-5 w-px bg-gray-200"></div><div class="flex items-center gap-2"><div id="userAvatar" class="h-7 w-7 rounded-full flex items-center justify-center text-white text-xs font-semibold"></div><span id="userName" class="text-xs font-medium text-gray-700"></span></div></div></div>
-        <div id="page-board" class="p-8">
+        <div class="topbar flex items-center justify-between px-8 py-3 sticky top-0 z-10"><h2 class="text-sm font-semibold text-gray-800" id="topBarTitle">CX Standup</h2><div class="flex items-center gap-4"><button class="btn btn-accent text-xs" id="topAddBtn" onclick="openAddModal()"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Add Item</button><div class="h-5 w-px bg-gray-200"></div><div class="flex items-center gap-2"><div id="userAvatar" class="h-7 w-7 rounded-full flex items-center justify-center text-white text-xs font-semibold"></div><span id="userName" class="text-xs font-medium text-gray-700"></span></div></div></div>
+
+        <!-- FEEDBACK THIS WEEK -->
+        <div id="page-feedback" class="p-8 hidden">
+            <div class="mb-6"><h1 class="text-2xl font-bold text-gray-900">Weekly Feedback</h1><p class="text-sm text-gray-500 mt-1" id="feedbackWeekLabel">Week of ...</p></div>
+            <div id="feedbackGrid"></div>
+        </div>
+
+        <!-- FEEDBACK HISTORY -->
+        <div id="page-feedback-history" class="p-8 hidden">
+            <div class="mb-6"><h1 class="text-2xl font-bold text-gray-900">Feedback History</h1><p class="text-sm text-gray-500 mt-1">Browse weekly feedback by person and week</p></div>
+            <div class="week-nav" id="historyWeekNav"></div>
+            <div id="historyContent"></div>
+        </div>
+
+        <!-- BOARD -->
+        <div id="page-board" class="p-8 hidden">
             <div class="mb-6"><h1 class="text-2xl font-bold text-gray-900">Priority Board</h1><p class="text-sm text-gray-500 mt-1">Drag items between lanes to reprioritize.</p></div>
             <div class="grid grid-cols-4 gap-4 mb-6" id="summaryCards"></div>
             <div class="grid grid-cols-3 gap-6">
@@ -116,6 +145,7 @@
                 <div class="lane lane-low" ondragover="handleDragOver(event)" ondrop="handleDrop(event,'Low')" ondragleave="handleDragLeave(event)"><div class="lane-header"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="text-lg">🔵</span><div><p class="text-sm font-bold text-blue-800">LOW</p><p class="text-[10px] text-blue-600 font-medium">This Month</p></div></div><span class="badge badge-blue" id="count-Low">0</span></div></div><div class="lane-body" id="body-Low"></div></div>
             </div>
         </div>
+        <!-- LIST -->
         <div id="page-list" class="p-8 hidden">
             <div class="mb-6"><h1 class="text-2xl font-bold text-gray-900">All Items</h1><p class="text-sm text-gray-500 mt-1">Full list of CX standup items</p></div>
             <div class="flex items-center gap-4 mb-6">
@@ -125,13 +155,16 @@
             </div>
             <div id="listContainer"></div>
         </div>
+        <!-- PEOPLE -->
         <div id="page-people" class="p-8 hidden"><div class="mb-6"><h1 class="text-2xl font-bold text-gray-900">By Person</h1><p class="text-sm text-gray-500 mt-1">Items grouped by owner. Multi-owner items shown first.</p></div><div id="peopleContent"></div></div>
+        <!-- SUMMARY -->
         <div id="page-summary" class="p-8 hidden"><div class="mb-6"><h1 class="text-2xl font-bold text-gray-900">Summary</h1><p class="text-sm text-gray-500 mt-1">Overview by owner, priority, and status</p></div><div id="summaryContent"></div></div>
     </main>
 </div></div>
+<!-- ACTION ITEM MODAL -->
 <div id="modal" class="fixed inset-0 z-50 hidden" onclick="if(event.target===this)closeModal()">
     <div class="absolute inset-0 bg-black/30"></div>
-    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg"><div class="card p-6">
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg"><div class="card p-6" style="max-height:90vh;overflow-y:auto">
         <div class="flex items-center justify-between mb-4"><h3 class="text-base font-semibold text-gray-900" id="modalTitle">Add New Item</h3><button class="btn-danger" onclick="closeModal()"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div>
         <form id="itemForm" onsubmit="saveItem(event)">
             <input type="hidden" id="f_id">
@@ -155,338 +188,191 @@
         </form>
     </div></div>
 </div>
+<!-- FEEDBACK DETAIL MODAL -->
+<div id="fbModal" class="fixed inset-0 z-50 hidden" onclick="if(event.target===this)closeFbModal()">
+    <div class="absolute inset-0 bg-black/30"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl"><div class="card p-6" style="max-height:90vh;overflow-y:auto">
+        <div class="flex items-center justify-between mb-4"><h3 class="text-base font-semibold text-gray-900" id="fbModalTitle">Weekly Feedback</h3><button class="btn-danger" onclick="closeFbModal()"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div>
+        <input type="hidden" id="fb_id">
+        <input type="hidden" id="fb_owner">
+        <input type="hidden" id="fb_week">
+        <div class="fb-section"><h4>📊 1. Performance vs Target (Key Metrics Only)</h4><textarea id="fb_performance" class="input-field w-full" rows="4" placeholder="Key metrics, actuals vs targets..."></textarea></div>
+        <div class="fb-section"><h4>🚨 2. Red Flags / Issues</h4><textarea id="fb_red_flags" class="input-field w-full" rows="4" placeholder="Issues, risks, things to be aware of..."></textarea></div>
+        <div class="fb-section"><h4>📌 3. Key Project Updates</h4><textarea id="fb_project_updates" class="input-field w-full" rows="4" placeholder="Project progress, milestones, blockers..."></textarea></div>
+        <div class="fb-section"><h4>🎯 4. Key Focus Item (This Week)</h4><textarea id="fb_key_focus" class="input-field w-full" rows="3" placeholder="The #1 priority for this week..."></textarea></div>
+        <div class="flex gap-3">
+            <button type="button" class="btn btn-accent flex-1 justify-center" onclick="saveFeedback('Submitted')"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Save & Submit</button>
+            <button type="button" class="btn flex-1 justify-center" style="background:#f3f4f6;color:#374151" onclick="saveFeedback('Draft')">Save Draft</button>
+        </div>
+    </div></div>
+</div>
 <script>
 const SUPABASE_URL='https://hqfszlxdkvwlvpwqqmbd.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhxZnN6bHhka3Z3bHZwd3FxbWJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1NTExODgsImV4cCI6MjA4ODEyNzE4OH0.4OlPny5uJFTslf6iWfF7fAaVl0x2I_VG63QPa1Amq8Q';
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const OWNERS=['Don','Mark','Kerushan','Daryl','Tunya','Tim','John','Greg','Verona'];
 const OWNER_COLORS={Don:'#f97316',Mark:'#3b82f6',Kerushan:'#10b981',Daryl:'#8b5cf6',Tunya:'#ec4899',Tim:'#06b6d4',John:'#f43f5e',Greg:'#84cc16',Verona:'#a855f7'};
-let currentUser=null,items=[],currentPage='board',currentOwnerFilter='all',draggedId=null,dropTargetId=null,selectedOwners=[];
+let currentUser=null,items=[],feedbacks=[],currentPage='feedback',currentOwnerFilter='all',draggedId=null,dropTargetId=null,selectedOwners=[];
+let historyWeekOffset=0;
 
-async function handleLogin(e){
-    e.preventDefault();
-    const user=document.getElementById('loginUser').value.trim().toLowerCase();
-    const pass=document.getElementById('loginPass').value;
-    const errEl=document.getElementById('loginError');
-    errEl.classList.add('hidden');
-    const{data,error}=await sb.from('cx_standup_users').select('*').eq('username',user).eq('password',pass).single();
-    if(error||!data){errEl.textContent='Invalid username or password';errEl.classList.remove('hidden');return;}
-    currentUser=data;sessionStorage.setItem('cx_user',JSON.stringify(data));showApp();
-}
+function getMonday(d){const dt=new Date(d);const day=dt.getDay();const diff=dt.getDate()-day+(day===0?-6:1);dt.setDate(diff);dt.setHours(0,0,0,0);return dt;}
+function formatWeek(d){const mon=getMonday(d);const sun=new Date(mon);sun.setDate(sun.getDate()+6);return mon.toLocaleDateString('en-ZA',{day:'numeric',month:'short'})+' – '+sun.toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'});}
+function getWeekStart(offset){const d=new Date();d.setDate(d.getDate()+(offset||0)*7);return getMonday(d).toISOString().split('T')[0];}
+
+// AUTH
+async function handleLogin(e){e.preventDefault();const user=document.getElementById('loginUser').value.trim().toLowerCase();const pass=document.getElementById('loginPass').value;const errEl=document.getElementById('loginError');errEl.classList.add('hidden');const{data,error}=await sb.from('cx_standup_users').select('*').eq('username',user).eq('password',pass).single();if(error||!data){errEl.textContent='Invalid username or password';errEl.classList.remove('hidden');return;}currentUser=data;sessionStorage.setItem('cx_user',JSON.stringify(data));showApp();}
 function handleLogout(){sessionStorage.removeItem('cx_user');currentUser=null;document.getElementById('mainApp').classList.add('hidden');document.getElementById('loginScreen').classList.remove('hidden');}
-function showApp(){
-    document.getElementById('loginScreen').classList.add('hidden');
-    document.getElementById('mainApp').classList.remove('hidden');
-    document.getElementById('userAvatar').style.background=currentUser.color;
-    document.getElementById('userAvatar').textContent=currentUser.display_name[0];
-    document.getElementById('userName').textContent=currentUser.display_name;
-    renderOwnerChips();
-    loadItems();
-}
+function showApp(){document.getElementById('loginScreen').classList.add('hidden');document.getElementById('mainApp').classList.remove('hidden');document.getElementById('userAvatar').style.background=currentUser.color;document.getElementById('userAvatar').textContent=currentUser.display_name[0];document.getElementById('userName').textContent=currentUser.display_name;renderOwnerChips();loadItems();loadFeedback();}
 function checkSession(){const s=sessionStorage.getItem('cx_user');if(s){currentUser=JSON.parse(s);showApp();}}
 
-function renderOwnerChips(){
-    const container=document.getElementById('f_owners');
-    container.innerHTML=OWNERS.map(o=>{
-        const c=OWNER_COLORS[o];
-        return '<div class="owner-chip" style="--chip-color:'+c+'" data-owner="'+o+'" onclick="toggleOwner(this)"><span class="chip-dot" style="background:'+c+'"></span>'+o+'</div>';
-    }).join('');
-}
-function toggleOwner(el){
-    el.classList.toggle('selected');
-    selectedOwners=Array.from(document.querySelectorAll('#f_owners .owner-chip.selected')).map(e=>e.dataset.owner);
-}
-function setSelectedOwners(owners){
-    selectedOwners=owners||[];
-    document.querySelectorAll('#f_owners .owner-chip').forEach(el=>{
-        if(selectedOwners.includes(el.dataset.owner))el.classList.add('selected');
-        else el.classList.remove('selected');
-    });
+// OWNER CHIPS
+function renderOwnerChips(){const c=document.getElementById('f_owners');if(!c)return;c.innerHTML=OWNERS.map(o=>'<div class="owner-chip" style="--chip-color:'+OWNER_COLORS[o]+'" data-owner="'+o+'" onclick="toggleOwner(this)"><span class="chip-dot" style="background:'+OWNER_COLORS[o]+'"></span>'+o+'</div>').join('');}
+function toggleOwner(el){el.classList.toggle('selected');selectedOwners=Array.from(document.querySelectorAll('#f_owners .owner-chip.selected')).map(e=>e.dataset.owner);}
+function setSelectedOwners(owners){selectedOwners=owners||[];document.querySelectorAll('#f_owners .owner-chip').forEach(el=>{if(selectedOwners.includes(el.dataset.owner))el.classList.add('selected');else el.classList.remove('selected');});}
+
+// DATA - ACTION ITEMS
+async function loadItems(){const{data,error}=await sb.from('cx_standup_items').select('*').order('sort_order',{ascending:true});if(error){console.error(error);return;}items=(data||[]).map(r=>({id:r.id,item:r.item,action:r.action,priority:r.priority,owner:r.owner,owners:r.owners||[r.owner],status:r.status,dueDate:r.due_date||null,comments:r.comments||[],sortOrder:r.sort_order||0,createdAt:r.created_at}));renderAll();}
+async function upsertItem(item){const row={id:item.id,item:item.item,action:item.action,priority:item.priority,owner:item.owners&&item.owners.length?item.owners[0]:item.owner,owners:item.owners||[item.owner],status:item.status,due_date:item.dueDate||null,comments:item.comments||[],sort_order:item.sortOrder||0,updated_at:new Date().toISOString()};await sb.from('cx_standup_items').upsert(row);}
+async function removeItem(id){await sb.from('cx_standup_items').delete().eq('id',id);await loadItems();}
+function getFiltered(){let f=[...items];if(currentOwnerFilter!=='all')f=f.filter(i=>(i.owners||[i.owner]).includes(currentOwnerFilter));return f;}
+
+// DATA - FEEDBACK
+async function loadFeedback(weekStart){const ws=weekStart||getWeekStart(0);const{data}=await sb.from('cx_standup_feedback').select('*').eq('week_start',ws);feedbacks=data||[];renderFeedbackPage();}
+async function loadFeedbackHistory(weekStart){const{data}=await sb.from('cx_standup_feedback').select('*').eq('week_start',weekStart);return data||[];}
+async function saveFeedback(status){
+    const id=document.getElementById('fb_id').value||Date.now().toString();
+    const owner=document.getElementById('fb_owner').value;
+    const week=document.getElementById('fb_week').value;
+    const row={id:id,owner:owner,week_start:week,performance:document.getElementById('fb_performance').value,red_flags:document.getElementById('fb_red_flags').value,project_updates:document.getElementById('fb_project_updates').value,key_focus:document.getElementById('fb_key_focus').value,status:status,updated_at:new Date().toISOString()};
+    await sb.from('cx_standup_feedback').upsert(row,{onConflict:'owner,week_start'});
+    closeFbModal();loadFeedback();
 }
 
-async function loadItems(){
-    const{data,error}=await sb.from('cx_standup_items').select('*').order('sort_order',{ascending:true});
-    if(error){console.error('Load error:',error);return;}
-    items=(data||[]).map(r=>({
-        id:r.id,item:r.item,action:r.action,priority:r.priority,
-        owner:r.owner,owners:r.owners||[r.owner],
-        status:r.status,dueDate:r.due_date||null,
-        comments:r.comments||[],
-        sortOrder:r.sort_order||0,createdAt:r.created_at
-    }));
-    renderAll();
-}
-async function upsertItem(item){
-    const row={id:item.id,item:item.item,action:item.action,priority:item.priority,
-        owner:item.owners&&item.owners.length?item.owners[0]:item.owner,
-        owners:item.owners||[item.owner],
-        status:item.status,due_date:item.dueDate||null,
-        comments:item.comments||[],
-        sort_order:item.sortOrder||0,updated_at:new Date().toISOString()};
-    const{error}=await sb.from('cx_standup_items').upsert(row);
-    if(error)console.error('Upsert error:',error);
-}
-async function removeItem(id){const{error}=await sb.from('cx_standup_items').delete().eq('id',id);if(error)console.error('Delete error:',error);}
-
-function getFiltered(){
-    let f=[...items];
-    if(currentOwnerFilter!=='all')f=f.filter(i=>(i.owners||[i.owner]).includes(currentOwnerFilter));
-    return f;
-}
+// REALTIME
 function subscribeRealtime(){
-    sb.channel('cx_standup_changes').on('postgres_changes',{event:'*',schema:'public',table:'cx_standup_items'},()=>{loadItems();}).subscribe();
+    sb.channel('cx_changes').on('postgres_changes',{event:'*',schema:'public',table:'cx_standup_items'},()=>{loadItems();}).on('postgres_changes',{event:'*',schema:'public',table:'cx_standup_feedback'},()=>{loadFeedback();}).subscribe();
 }
 
-function statusBadge(s){const m={Open:'badge-gray','In Progress':'badge-amber',Blocked:'badge-red',Done:'badge-green'};return '<span class="badge '+m[s]+'">'+s+'</span>';}
+// BADGES
+function statusBadge(s){const m={Open:'badge-gray','In Progress':'badge-amber',Blocked:'badge-red',Done:'badge-green'};return '<span class="badge '+(m[s]||'badge-gray')+'">'+s+'</span>';}
 function priorityBadge(p){const m={High:'badge-red',Medium:'badge-amber',Low:'badge-blue'};const i={High:'🔴',Medium:'🟡',Low:'🔵'};return '<span class="badge '+m[p]+'">'+i[p]+' '+p+'</span>';}
 function ownerBadge(o){const c=OWNER_COLORS[o]||'#6b7280';return '<span class="badge" style="background:'+c+'15;color:'+c+'">'+o+'</span>';}
-function ownersBadges(owners){return (owners||[]).map(o=>ownerBadge(o)).join('');}
+function dueBadge(d){if(!d)return '';const due=new Date(d+'T00:00:00');const now=new Date();now.setHours(0,0,0,0);const diff=Math.ceil((due-now)/(864e5));const label=due.toLocaleDateString('en-ZA',{day:'numeric',month:'short'});if(diff<0)return '<span class="due-badge due-overdue">⚠️ '+label+'</span>';if(diff<=3)return '<span class="due-badge due-soon">📅 '+label+'</span>';return '<span class="due-badge due-ok">📅 '+label+'</span>';}
 
-function dueBadge(d){
-    if(!d)return '';
-    const due=new Date(d+'T00:00:00');
-    const now=new Date();now.setHours(0,0,0,0);
-    const diff=Math.ceil((due-now)/(1000*60*60*24));
-    const label=due.toLocaleDateString('en-ZA',{day:'numeric',month:'short'});
-    if(diff<0)return '<span class="due-badge due-overdue">⚠️ '+label+' (overdue)</span>';
-    if(diff<=3)return '<span class="due-badge due-soon">📅 '+label+' ('+diff+'d)</span>';
-    return '<span class="due-badge due-ok">📅 '+label+'</span>';
-}
-
-function openAddModal(priority){
-    document.getElementById('f_id').value='';
-    document.getElementById('f_item').value='';
-    document.getElementById('f_action').value='';
-    document.getElementById('f_priority').value=priority||'High';
-    document.getElementById('f_status').value='Open';
-    document.getElementById('f_dueDate').value='';
-    document.getElementById('commentsSection').style.display='none';
-    document.getElementById('commentsList').innerHTML='';
-    renderOwnerChips();
-    setSelectedOwners(currentUser?[currentUser.display_name]:['Don']);
-    document.getElementById('modalTitle').textContent='Add New Item';
-    document.getElementById('modalSubmitText').textContent='Add Item';
-    document.getElementById('modal').classList.remove('hidden');
-    document.getElementById('f_item').focus();
-}
-function openEditModal(id){
-    const item=items.find(i=>i.id===id);if(!item)return;
-    document.getElementById('f_id').value=item.id;
-    document.getElementById('f_item').value=item.item;
-    document.getElementById('f_action').value=item.action;
-    document.getElementById('f_priority').value=item.priority;
-    document.getElementById('f_status').value=item.status;
-    document.getElementById('f_dueDate').value=item.dueDate||'';
-    document.getElementById('commentsSection').style.display='block';
-    renderComments(item.comments||[]);
-    renderOwnerChips();
-    setSelectedOwners(item.owners||[item.owner]);
-    document.getElementById('modalTitle').textContent='Edit Item';
-    document.getElementById('modalSubmitText').textContent='Save Changes';
-    document.getElementById('modal').classList.remove('hidden');
-    document.getElementById('f_item').focus();
-}
+// ACTION ITEM MODAL
+function openAddModal(priority){document.getElementById('f_id').value='';document.getElementById('f_item').value='';document.getElementById('f_action').value='';document.getElementById('f_priority').value=priority||'High';document.getElementById('f_status').value='Open';document.getElementById('f_dueDate').value='';document.getElementById('commentsSection').style.display='none';document.getElementById('commentsList').innerHTML='';renderOwnerChips();setSelectedOwners(currentUser?[currentUser.display_name]:['Don']);document.getElementById('modalTitle').textContent='Add New Item';document.getElementById('modalSubmitText').textContent='Add Item';document.getElementById('modal').classList.remove('hidden');document.getElementById('f_item').focus();}
+function openEditModal(id){const item=items.find(i=>i.id===id);if(!item)return;document.getElementById('f_id').value=item.id;document.getElementById('f_item').value=item.item;document.getElementById('f_action').value=item.action;document.getElementById('f_priority').value=item.priority;document.getElementById('f_status').value=item.status;document.getElementById('f_dueDate').value=item.dueDate||'';document.getElementById('commentsSection').style.display='block';renderComments(item.comments||[]);renderOwnerChips();setSelectedOwners(item.owners||[item.owner]);document.getElementById('modalTitle').textContent='Edit Item';document.getElementById('modalSubmitText').textContent='Save Changes';document.getElementById('modal').classList.remove('hidden');document.getElementById('f_item').focus();}
 function closeModal(){document.getElementById('modal').classList.add('hidden');}
 
-function renderComments(comments){
-    const list=document.getElementById('commentsList');
-    if(!comments||!comments.length){list.innerHTML='<p class="text-xs text-gray-400 py-2">No comments yet.</p>';return;}
-    list.innerHTML=comments.slice().reverse().map(c=>{
-        const d=new Date(c.date);
-        const dateStr=d.toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'})+' '+d.toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'});
-        const who=c.author||'Unknown';
-        const col=OWNER_COLORS[who]||'#6b7280';
-        return '<div class="comment-item"><div class="comment-meta"><span style="color:'+col+';font-weight:600">'+who+'</span> · '+dateStr+'</div><div class="comment-text">'+c.text+'</div></div>';
-    }).join('');
-    list.scrollTop=0;
-}
+// COMMENTS
+function renderComments(comments){const list=document.getElementById('commentsList');if(!comments||!comments.length){list.innerHTML='<p class="text-xs text-gray-400 py-2">No comments yet.</p>';return;}list.innerHTML=comments.slice().reverse().map(c=>{const d=new Date(c.date);const ds=d.toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'})+' '+d.toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'});const col=OWNER_COLORS[c.author]||'#6b7280';return '<div class="comment-item"><div class="comment-meta"><span style="color:'+col+';font-weight:600">'+c.author+'</span> · '+ds+'</div><div class="comment-text">'+c.text+'</div></div>';}).join('');list.scrollTop=0;}
+function addComment(){const input=document.getElementById('f_newComment');const text=input.value.trim();if(!text)return;const id=document.getElementById('f_id').value;if(!id)return;const item=items.find(i=>i.id===id);if(!item)return;if(!item.comments)item.comments=[];item.comments.push({text:text,author:currentUser?currentUser.display_name:'Unknown',date:new Date().toISOString()});renderComments(item.comments);input.value='';upsertItem(item);}
 
-function addComment(){
-    const input=document.getElementById('f_newComment');
-    const text=input.value.trim();
-    if(!text)return;
-    const id=document.getElementById('f_id').value;
-    if(!id)return;
-    const item=items.find(i=>i.id===id);
-    if(!item)return;
-    const comment={text:text,author:currentUser?currentUser.display_name:'Unknown',date:new Date().toISOString()};
-    if(!item.comments)item.comments=[];
-    item.comments.push(comment);
-    renderComments(item.comments);
-    input.value='';
-    upsertItem(item);
-}
+async function saveItem(e){e.preventDefault();if(selectedOwners.length===0){alert('Please select at least one owner');return;}const id=document.getElementById('f_id').value;const data={item:document.getElementById('f_item').value.trim(),action:document.getElementById('f_action').value.trim(),priority:document.getElementById('f_priority').value,owners:selectedOwners,owner:selectedOwners[0],status:document.getElementById('f_status').value,dueDate:document.getElementById('f_dueDate').value||null};if(id){const existing=items.find(i=>i.id===id);await upsertItem({...existing,...data});}else{await upsertItem({id:Date.now().toString(),...data,comments:[],sortOrder:0,createdAt:new Date().toISOString()});}closeModal();await loadItems();}
+async function deleteItem(id){if(!confirm('Delete this item?'))return;await removeItem(id);}
 
-async function saveItem(e){
-    e.preventDefault();
-    if(selectedOwners.length===0){alert('Please select at least one owner');return;}
-    const id=document.getElementById('f_id').value;
-    const data={item:document.getElementById('f_item').value.trim(),action:document.getElementById('f_action').value.trim(),priority:document.getElementById('f_priority').value,owners:selectedOwners,owner:selectedOwners[0],status:document.getElementById('f_status').value,dueDate:document.getElementById('f_dueDate').value||null};
-    if(id){const existing=items.find(i=>i.id===id);await upsertItem({...existing,...data});}
-    else{await upsertItem({id:Date.now().toString(),...data,comments:[],sortOrder:0,createdAt:new Date().toISOString()});}
-    closeModal();await loadItems();
-}
-async function deleteItem(id){if(!confirm('Delete this item?'))return;await removeItem(id);await loadItems();}
-
+// DRAG & DROP
 function handleDragStart(e,id){draggedId=id;e.target.classList.add('dragging');e.dataTransfer.effectAllowed='move';}
-function handleDragEnd(e){e.target.classList.remove('dragging');document.querySelectorAll('.lane-body').forEach(b=>b.classList.remove('drag-over'));document.querySelectorAll('.drop-before').forEach(el=>el.classList.remove('drop-before'));document.querySelectorAll('.drop-after').forEach(el=>el.classList.remove('drop-after'));dropTargetId=null;}
+function handleDragEnd(e){e.target.classList.remove('dragging');document.querySelectorAll('.lane-body').forEach(b=>b.classList.remove('drag-over'));document.querySelectorAll('.drop-before,.drop-after').forEach(el=>{el.classList.remove('drop-before','drop-after');});dropTargetId=null;}
 function handleDragOver(e){e.preventDefault();e.dataTransfer.dropEffect='move';const body=e.currentTarget.querySelector('.lane-body')||e.currentTarget;if(body.classList.contains('lane-body'))body.classList.add('drag-over');}
 function handleDragLeave(e){const body=e.currentTarget.querySelector('.lane-body')||e.currentTarget;if(body.classList.contains('lane-body'))body.classList.remove('drag-over');}
-function handleCardDragOver(e,id){e.preventDefault();e.stopPropagation();e.dataTransfer.dropEffect='move';document.querySelectorAll('.drop-before').forEach(el=>el.classList.remove('drop-before'));document.querySelectorAll('.drop-after').forEach(el=>el.classList.remove('drop-after'));const card=e.currentTarget;const rect=card.getBoundingClientRect();const midY=rect.top+rect.height/2;if(e.clientY<midY){card.classList.add('drop-before');dropTargetId=id;}else{card.classList.add('drop-after');dropTargetId=id+':after';}}
+function handleCardDragOver(e,id){e.preventDefault();e.stopPropagation();document.querySelectorAll('.drop-before,.drop-after').forEach(el=>el.classList.remove('drop-before','drop-after'));const card=e.currentTarget;const rect=card.getBoundingClientRect();if(e.clientY<rect.top+rect.height/2){card.classList.add('drop-before');dropTargetId=id;}else{card.classList.add('drop-after');dropTargetId=id+':after';}}
 function handleCardDragLeave(e){e.currentTarget.classList.remove('drop-before','drop-after');}
+async function handleDrop(e,priority){e.preventDefault();document.querySelectorAll('.lane-body').forEach(b=>b.classList.remove('drag-over'));document.querySelectorAll('.drop-before,.drop-after').forEach(el=>el.classList.remove('drop-before','drop-after'));if(!draggedId)return;const dragIdx=items.findIndex(i=>i.id===draggedId);if(dragIdx<0)return;const[di]=items.splice(dragIdx,1);di.priority=priority;if(dropTargetId){const isA=dropTargetId.endsWith(':after');const tid=isA?dropTargetId.replace(':after',''):dropTargetId;const ti=items.findIndex(i=>i.id===tid);if(ti>=0)items.splice(isA?ti+1:ti,0,di);else items.push(di);}else{let li=-1;for(let i=items.length-1;i>=0;i--)if(items[i].priority===priority){li=i;break;}items.splice(li>=0?li+1:items.length,0,di);}for(let i=0;i<items.length;i++)items[i].sortOrder=i;await Promise.all(items.map(item=>upsertItem(item)));draggedId=null;dropTargetId=null;renderAll();}
 
-async function handleDrop(e,priority){
-    e.preventDefault();
-    document.querySelectorAll('.lane-body').forEach(b=>b.classList.remove('drag-over'));
-    document.querySelectorAll('.drop-before').forEach(el=>el.classList.remove('drop-before'));
-    document.querySelectorAll('.drop-after').forEach(el=>el.classList.remove('drop-after'));
-    if(!draggedId)return;
-    const dragIdx=items.findIndex(i=>i.id===draggedId);if(dragIdx<0)return;
-    const[draggedItem]=items.splice(dragIdx,1);draggedItem.priority=priority;
-    if(dropTargetId){
-        const isAfter=dropTargetId.endsWith(':after');const targetId=isAfter?dropTargetId.replace(':after',''):dropTargetId;
-        const targetIdx=items.findIndex(i=>i.id===targetId);
-        if(targetIdx>=0)items.splice(isAfter?targetIdx+1:targetIdx,0,draggedItem);else items.push(draggedItem);
-    }else{let lastIdx=-1;for(let i=items.length-1;i>=0;i--){if(items[i].priority===priority){lastIdx=i;break;}}items.splice(lastIdx>=0?lastIdx+1:items.length,0,draggedItem);}
-    for(let i=0;i<items.length;i++)items[i].sortOrder=i;
-    await Promise.all(items.map(item=>upsertItem(item)));
-    draggedId=null;dropTargetId=null;renderAll();
-}
+// RENDER CARD
+function renderCard(item){const ownersHtml=(item.owners||[item.owner]).map(o=>ownerBadge(o)).join('');const dueHtml=dueBadge(item.dueDate);return '<div class="drag-card" draggable="true" ondragstart="handleDragStart(event,\''+item.id+'\')" ondragend="handleDragEnd(event)" ondragover="handleCardDragOver(event,\''+item.id+'\')" ondragleave="handleCardDragLeave(event)"><div class="flex items-start justify-between gap-2 mb-1"><div class="card-title flex-1 cursor-pointer" onclick="openEditModal(\''+item.id+'\')">'+item.item+'</div><div class="flex items-center gap-1 flex-shrink-0"><button class="text-gray-400 hover:text-blue-600 p-1 rounded hover:bg-blue-50" onclick="openEditModal(\''+item.id+'\')" title="Edit"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button><button class="text-gray-400 hover:text-red-600 p-1 rounded hover:bg-red-50" onclick="deleteItem(\''+item.id+'\')" title="Delete"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div></div><div class="card-action">'+item.action+'</div>'+(dueHtml?'<div class="mb-2">'+dueHtml+'</div>':'')+'<div class="card-meta">'+statusBadge(item.status)+ownersHtml+((item.comments&&item.comments.length)?'<span class="badge badge-gray">💬 '+item.comments.length+'</span>':'')+'<span class="badge badge-gray" style="font-size:9px">📌 '+new Date(item.createdAt).toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'})+'</span></div></div>';}
 
-function renderCard(item){
-    const ownersHtml=(item.owners||[item.owner]).map(o=>ownerBadge(o)).join('');
-    const dueHtml=dueBadge(item.dueDate);
-    return '<div class="drag-card" draggable="true" ondragstart="handleDragStart(event,\''+item.id+'\')" ondragend="handleDragEnd(event)" ondragover="handleCardDragOver(event,\''+item.id+'\')" ondragleave="handleCardDragLeave(event)">'
-        +'<div class="flex items-start justify-between gap-2 mb-1">'
-        +'<div class="card-title flex-1 cursor-pointer" onclick="openEditModal(\''+item.id+'\')">'+item.item+'</div>'
-        +'<div class="flex items-center gap-1 flex-shrink-0">'
-        +'<button class="text-gray-400 hover:text-blue-600 p-1 rounded hover:bg-blue-50 transition-colors" onclick="openEditModal(\''+item.id+'\')" title="Edit"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>'
-        +'<button class="text-gray-400 hover:text-red-600 p-1 rounded hover:bg-red-50 transition-colors" onclick="deleteItem(\''+item.id+'\')" title="Delete"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>'
-        +'</div></div>'
-        +'<div class="card-action">'+item.action+'</div>'
-        +(dueHtml?'<div class="mb-2">'+dueHtml+'</div>':'')
-        +'<div class="card-meta">'+statusBadge(item.status)+ownersHtml+((item.comments&&item.comments.length)?'<span class="badge badge-gray">💬 '+item.comments.length+'</span>':'')+'<span class="badge badge-gray" style="font-size:9px">📌 '+new Date(item.createdAt).toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'})+'</span>'+'</div>'
-        +'</div>';
-}
+// RENDER PAGES
+function renderBoard(){const f=getFiltered();['High','Medium','Low'].forEach(p=>{const li=f.filter(i=>i.priority===p);document.getElementById('body-'+p).innerHTML=li.length?li.map(renderCard).join(''):'<div class="text-center text-xs text-gray-400 py-8">Drag items here or click Add Item</div>';document.getElementById('count-'+p).textContent=li.length;});}
+function renderSummaryCards(){const h=items.filter(i=>i.priority==='High'),m=items.filter(i=>i.priority==='Medium'),l=items.filter(i=>i.priority==='Low');const o=items.filter(i=>i.status==='Open').length,p=items.filter(i=>i.status==='In Progress').length;const od=items.filter(i=>{if(!i.dueDate)return false;const d=new Date(i.dueDate+'T00:00:00');const n=new Date();n.setHours(0,0,0,0);return d<n&&i.status!=='Done';}).length;document.getElementById('summaryCards').innerHTML='<div class="stat-card text-center" style="border-left:4px solid #6366f1"><p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total</p><p class="text-2xl font-bold text-indigo-600 mt-1">'+items.length+'</p><p class="text-xs text-gray-400 mt-1">'+o+' open · '+p+' in progress'+(od?' · <span class="text-red-500">'+od+' overdue</span>':'')+'</p></div><div class="stat-card text-center" style="border-left:4px solid #ef4444"><p class="text-xs font-medium text-gray-500 uppercase tracking-wide">🔴 High</p><p class="text-2xl font-bold text-red-600 mt-1">'+h.length+'</p><p class="text-xs text-gray-400 mt-1">This Week</p></div><div class="stat-card text-center" style="border-left:4px solid #f59e0b"><p class="text-xs font-medium text-gray-500 uppercase tracking-wide">🟡 Medium</p><p class="text-2xl font-bold text-amber-600 mt-1">'+m.length+'</p><p class="text-xs text-gray-400 mt-1">Next 2 Weeks</p></div><div class="stat-card text-center" style="border-left:4px solid #3b82f6"><p class="text-xs font-medium text-gray-500 uppercase tracking-wide">🔵 Low</p><p class="text-2xl font-bold text-blue-600 mt-1">'+l.length+'</p><p class="text-xs text-gray-400 mt-1">This Month</p></div>';}
+function renderList(){let f=getFiltered();const sf=document.getElementById('listStatusFilter').value,pf=document.getElementById('listPriorityFilter').value,of2=document.getElementById('listOwnerFilter').value;if(sf!=='all')f=f.filter(i=>i.status===sf);if(pf!=='all')f=f.filter(i=>i.priority===pf);if(of2!=='all')f=f.filter(i=>(i.owners||[i.owner]).includes(of2));if(!f.length){document.getElementById('listContainer').innerHTML='<div class="card p-12 text-center text-gray-400 text-sm">No items match.</div>';return;}let h='<div class="space-y-3">';f.forEach(i=>{const ow=(i.owners||[i.owner]).map(o=>ownerBadge(o)).join('');const dh=dueBadge(i.dueDate);h+='<div class="card p-5"><div class="flex items-start justify-between gap-4 mb-3"><div class="flex-1 cursor-pointer" onclick="openEditModal(\''+i.id+'\')"><div class="text-sm font-semibold text-gray-900">'+i.item+'</div><div class="text-xs text-gray-500 mt-1">'+i.action+'</div></div><button class="btn-danger" onclick="deleteItem(\''+i.id+'\')"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div><div class="flex flex-wrap gap-2 items-center">'+priorityBadge(i.priority)+statusBadge(i.status)+ow+(dh?' '+dh:'')+'</div></div>';});h+='</div>';document.getElementById('listContainer').innerHTML=h;}
+function renderPeople(){let h='';const mi=items.filter(i=>(i.owners||[]).length>1);if(mi.length){h+='<div class="card overflow-hidden mb-6"><div class="card-header" style="background:linear-gradient(135deg,#eef2ff,#e0e7ff);border-bottom:2px solid #a5b4fc"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="text-lg">👥</span><span class="text-sm font-bold text-indigo-800">Multiple Owners</span></div><span class="badge badge-gray">'+mi.length+'</span></div></div><div class="p-3 space-y-2">';mi.forEach(i=>{const ow=(i.owners||[]).map(o=>ownerBadge(o)).join('');h+='<div class="flex items-center justify-between py-3 px-4 rounded-lg hover:bg-gray-50 cursor-pointer" onclick="openEditModal(\''+i.id+'\')"><div class="flex-1 mr-3"><div class="text-xs font-semibold text-gray-900">'+i.item+'</div><div class="text-[10px] text-gray-500 mt-0.5">'+i.action+'</div></div><div class="flex flex-wrap items-center gap-1">'+priorityBadge(i.priority)+statusBadge(i.status)+ow+'</div></div>';});h+='</div></div>';}OWNERS.forEach(o=>{const oi=items.filter(i=>{const ow=i.owners||[i.owner];return ow.length===1&&ow[0]===o;});if(!oi.length)return;const c=OWNER_COLORS[o];h+='<div class="card overflow-hidden mb-4"><div class="card-header" style="border-left:4px solid '+c+'"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full inline-block" style="background:'+c+'"></span><span class="text-sm font-bold text-gray-800">'+o+'</span></div><span class="badge badge-gray">'+oi.length+'</span></div></div><div class="p-3 space-y-2">';oi.forEach(i=>{const dh=dueBadge(i.dueDate);h+='<div class="flex items-center justify-between py-3 px-4 rounded-lg hover:bg-gray-50 cursor-pointer" onclick="openEditModal(\''+i.id+'\')"><div class="flex-1 mr-3"><div class="text-xs font-semibold text-gray-900">'+i.item+'</div><div class="text-[10px] text-gray-500 mt-0.5">'+i.action+'</div></div><div class="flex flex-wrap items-center gap-1">'+priorityBadge(i.priority)+statusBadge(i.status)+(dh?' '+dh:'')+'</div></div>';});h+='</div></div>';});if(!h)h='<div class="card p-12 text-center text-gray-400 text-sm">No items yet.</div>';document.getElementById('peopleContent').innerHTML=h;}
+function renderSummary(){const pr=['High','Medium','Low'];const pc={High:'red',Medium:'amber',Low:'blue'};let h='<div class="grid grid-cols-3 gap-6 mb-6">';pr.forEach(p=>{const pi=items.filter(i=>i.priority===p);h+='<div class="card overflow-hidden"><div class="card-header" style="background:'+(p==='High'?'#fef2f2':p==='Medium'?'#fffbeb':'#eff6ff')+'"><div class="flex items-center justify-between"><span class="text-sm font-bold text-gray-800">'+p+'</span><span class="badge badge-'+pc[p]+'">'+pi.length+'</span></div></div><div class="p-3 space-y-2">';if(!pi.length)h+='<p class="text-xs text-gray-400 text-center py-4">No items</p>';else pi.forEach(i=>{h+='<div class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50"><span class="text-xs text-gray-700 flex-1">'+i.item+'</span><div class="flex gap-1">'+(i.owners||[i.owner]).map(o=>ownerBadge(o)).join('')+'</div></div>';});h+='</div></div>';});h+='</div><div class="card"><div class="card-header"><span class="text-xs font-semibold uppercase tracking-wider text-gray-500">By Status</span></div><div class="p-4"><div class="grid grid-cols-4 gap-4">';['Open','In Progress','Blocked','Done'].forEach(s=>{h+='<div class="text-center p-4 rounded-lg bg-gray-50"><p class="text-2xl font-bold text-gray-900">'+items.filter(i=>i.status===s).length+'</p><p class="text-xs text-gray-500 mt-1">'+s+'</p></div>';});h+='</div></div></div>';document.getElementById('summaryContent').innerHTML=h;}
 
-function renderBoard(){
-    const filtered=getFiltered();
-    ['High','Medium','Low'].forEach(p=>{
-        const laneItems=filtered.filter(i=>i.priority===p);
-        document.getElementById('body-'+p).innerHTML=laneItems.length?laneItems.map(renderCard).join(''):'<div class="text-center text-xs text-gray-400 py-8">Drag items here or click Add Item</div>';
-        document.getElementById('count-'+p).textContent=laneItems.length;
-    });
-}
-
-function renderSummaryCards(){
-    const high=items.filter(i=>i.priority==='High'),med=items.filter(i=>i.priority==='Medium'),low=items.filter(i=>i.priority==='Low');
-    const open=items.filter(i=>i.status==='Open').length,prog=items.filter(i=>i.status==='In Progress').length;
-    const overdue=items.filter(i=>{if(!i.dueDate)return false;const d=new Date(i.dueDate+'T00:00:00');const n=new Date();n.setHours(0,0,0,0);return d<n&&i.status!=='Done';}).length;
-    document.getElementById('summaryCards').innerHTML=
-        '<div class="stat-card text-center" style="border-left:4px solid #6366f1"><p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Items</p><p class="text-2xl font-bold text-indigo-600 mt-1">'+items.length+'</p><p class="text-xs text-gray-400 mt-1">'+open+' open · '+prog+' in progress'+(overdue?' · <span class="text-red-500">'+overdue+' overdue</span>':'')+'</p></div>'
-        +'<div class="stat-card text-center" style="border-left:4px solid #ef4444"><p class="text-xs font-medium text-gray-500 uppercase tracking-wide">🔴 High</p><p class="text-2xl font-bold text-red-600 mt-1">'+high.length+'</p><p class="text-xs text-gray-400 mt-1">This Week</p></div>'
-        +'<div class="stat-card text-center" style="border-left:4px solid #f59e0b"><p class="text-xs font-medium text-gray-500 uppercase tracking-wide">🟡 Medium</p><p class="text-2xl font-bold text-amber-600 mt-1">'+med.length+'</p><p class="text-xs text-gray-400 mt-1">Next 2 Weeks</p></div>'
-        +'<div class="stat-card text-center" style="border-left:4px solid #3b82f6"><p class="text-xs font-medium text-gray-500 uppercase tracking-wide">🔵 Low</p><p class="text-2xl font-bold text-blue-600 mt-1">'+low.length+'</p><p class="text-xs text-gray-400 mt-1">This Month</p></div>';
-}
-
-function renderList(){
-    let filtered=getFiltered();
-    const sf=document.getElementById('listStatusFilter').value,pf=document.getElementById('listPriorityFilter').value,of2=document.getElementById('listOwnerFilter').value;
-    if(sf!=='all')filtered=filtered.filter(i=>i.status===sf);
-    if(pf!=='all')filtered=filtered.filter(i=>i.priority===pf);
-    if(of2!=='all')filtered=filtered.filter(i=>(i.owners||[i.owner]).includes(of2));
-    if(!filtered.length){document.getElementById('listContainer').innerHTML='<div class="card p-12 text-center text-gray-400 text-sm">No items match your filters.</div>';return;}
-    let html='<div class="space-y-3">';
-    filtered.forEach(item=>{
-        const ownersHtml=(item.owners||[item.owner]).map(o=>ownerBadge(o)).join('');
-        const dueHtml=dueBadge(item.dueDate);
-        html+='<div class="card p-5"><div class="flex items-start justify-between gap-4 mb-3"><div class="flex-1 cursor-pointer" onclick="openEditModal(\''+item.id+'\')">'
-            +'<div class="text-sm font-semibold text-gray-900">'+item.item+'</div>'
-            +'<div class="text-xs text-gray-500 mt-1 leading-relaxed">'+item.action+'</div></div>'
-            +'<button class="btn-danger" onclick="deleteItem(\''+item.id+'\')"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div>'
-            +'<div class="flex flex-wrap gap-2 items-center">'+priorityBadge(item.priority)+statusBadge(item.status)+ownersHtml+(dueHtml?' '+dueHtml:'')+'</div></div>';
-    });
-    html+='</div>';
-    document.getElementById('listContainer').innerHTML=html;
-}
-
-function renderSummary(){
-    const priorities=['High','Medium','Low'];
-    const priColor={High:'red',Medium:'amber',Low:'blue'};
-    let html='<div class="grid grid-cols-3 gap-6 mb-6">';
-    priorities.forEach(p=>{
-        const pi=items.filter(i=>i.priority===p);
-        html+='<div class="card overflow-hidden"><div class="card-header" style="background:'+(p==='High'?'#fef2f2':p==='Medium'?'#fffbeb':'#eff6ff')+'"><div class="flex items-center justify-between"><span class="text-sm font-bold text-gray-800">'+p+' Priority</span><span class="badge badge-'+priColor[p]+'">'+pi.length+'</span></div></div><div class="p-3 space-y-2">';
-        if(!pi.length)html+='<p class="text-xs text-gray-400 text-center py-4">No items</p>';
-        else pi.forEach(i=>{html+='<div class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50"><span class="text-xs text-gray-700 flex-1">'+i.item+'</span><div class="flex gap-1">'+(i.owners||[i.owner]).map(o=>ownerBadge(o)).join('')+'</div></div>';});
-        html+='</div></div>';
-    });
-    html+='</div>';
-    html+='<div class="grid grid-cols-3 gap-6 mb-6">';
+// FEEDBACK PAGES
+function renderFeedbackPage(){
+    const ws=getWeekStart(0);
+    document.getElementById('feedbackWeekLabel').textContent='Week of '+formatWeek(new Date());
+    let h='<div class="grid grid-cols-3 gap-4">';
     OWNERS.forEach(o=>{
-        const oi=items.filter(i=>(i.owners||[i.owner]).includes(o));
-        if(!oi.length)return;
+        const fb=feedbacks.find(f=>f.owner===o);
         const c=OWNER_COLORS[o];
-        html+='<div class="card overflow-hidden"><div class="card-header"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full inline-block" style="background:'+c+'"></span><span class="text-sm font-semibold text-gray-800">'+o+'</span></div><span class="badge badge-gray">'+oi.length+'</span></div></div><div class="p-3 space-y-2">';
-        oi.forEach(i=>{html+='<div class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50"><span class="text-xs text-gray-700 flex-1">'+i.item+'</span>'+priorityBadge(i.priority)+'</div>';});
-        html+='</div></div>';
+        const st=fb?fb.status:'Not Started';
+        const stBadge=st==='Submitted'?'badge-green':st==='Draft'?'badge-amber':'badge-gray';
+        h+='<div class="fb-card" onclick="openFbModal(\''+o+'\',\''+ws+'\')" style="border-left:4px solid '+c+'">';
+        h+='<div class="flex items-center justify-between mb-3"><div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full" style="background:'+c+'"></span><span class="text-sm font-bold text-gray-800">'+o+'</span></div><span class="badge '+stBadge+'">'+st+'</span></div>';
+        if(fb&&fb.key_focus){h+='<div class="text-xs text-gray-500 mb-1">🎯 Focus:</div><div class="text-xs text-gray-700 line-clamp-2">'+fb.key_focus.substring(0,100)+(fb.key_focus.length>100?'...':'')+'</div>';}
+        else{h+='<div class="text-xs text-gray-400 italic">Click to add feedback</div>';}
+        h+='</div>';
     });
-    html+='</div>';
-    html+='<div class="card"><div class="card-header"><span class="text-xs font-semibold uppercase tracking-wider text-gray-500">By Status</span></div><div class="p-4"><div class="grid grid-cols-4 gap-4">';
-    ['Open','In Progress','Blocked','Done'].forEach(s=>{html+='<div class="text-center p-4 rounded-lg bg-gray-50"><p class="text-2xl font-bold text-gray-900">'+items.filter(i=>i.status===s).length+'</p><p class="text-xs text-gray-500 mt-1">'+s+'</p></div>';});
-    html+='</div></div></div>';
-    document.getElementById('summaryContent').innerHTML=html;
+    h+='</div>';
+    document.getElementById('feedbackGrid').innerHTML=h;
 }
 
+function openFbModal(owner,weekStart){
+    const fb=feedbacks.find(f=>f.owner===owner&&f.week_start===weekStart);
+    document.getElementById('fb_id').value=fb?fb.id:'';
+    document.getElementById('fb_owner').value=owner;
+    document.getElementById('fb_week').value=weekStart;
+    document.getElementById('fb_performance').value=fb?fb.performance:'';
+    document.getElementById('fb_red_flags').value=fb?fb.red_flags:'';
+    document.getElementById('fb_project_updates').value=fb?fb.project_updates:'';
+    document.getElementById('fb_key_focus').value=fb?fb.key_focus:'';
+    const c=OWNER_COLORS[owner]||'#6b7280';
+    document.getElementById('fbModalTitle').innerHTML='<span style="color:'+c+'">'+owner+'</span> — Week of '+formatWeek(new Date(weekStart+'T00:00:00'));
+    document.getElementById('fbModal').classList.remove('hidden');
+}
+function closeFbModal(){document.getElementById('fbModal').classList.add('hidden');}
+
+async function renderFeedbackHistory(){
+    const ws=getWeekStart(historyWeekOffset);
+    const weekDate=new Date(ws+'T00:00:00');
+    let nav='<button onclick="historyWeekOffset--;renderFeedbackHistory()">← Previous</button>';
+    nav+='<div class="week-label">'+formatWeek(weekDate)+'</div>';
+    if(historyWeekOffset<0)nav+='<button onclick="historyWeekOffset++;renderFeedbackHistory()">Next →</button>';
+    else nav+='<button disabled style="opacity:0.3">Next →</button>';
+    document.getElementById('historyWeekNav').innerHTML=nav;
+    const data=await loadFeedbackHistory(ws);
+    let h='';
+    if(!data.length){h='<div class="card p-12 text-center text-gray-400 text-sm">No feedback submitted for this week.</div>';}
+    else{
+        h+='<div class="space-y-4">';
+        OWNERS.forEach(o=>{
+            const fb=data.find(f=>f.owner===o);
+            if(!fb)return;
+            const c=OWNER_COLORS[o];
+            const st=fb.status==='Submitted'?'badge-green':'badge-amber';
+            h+='<div class="card overflow-hidden"><div class="card-header" style="border-left:4px solid '+c+'"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full" style="background:'+c+'"></span><span class="text-sm font-bold text-gray-800">'+o+'</span></div><div class="flex items-center gap-2"><span class="badge '+st+'">'+fb.status+'</span><button class="btn-danger text-xs" onclick="openFbModal(\''+o+'\',\''+ws+'\')">Edit</button></div></div></div><div class="p-4 grid grid-cols-2 gap-4">';
+            h+='<div class="fb-section"><h4>📊 Performance vs Target</h4><div class="fb-content">'+(fb.performance||'<span class="text-gray-400 italic">Not provided</span>')+'</div></div>';
+            h+='<div class="fb-section"><h4>🚨 Red Flags / Issues</h4><div class="fb-content">'+(fb.red_flags||'<span class="text-gray-400 italic">Not provided</span>')+'</div></div>';
+            h+='<div class="fb-section"><h4>📌 Key Project Updates</h4><div class="fb-content">'+(fb.project_updates||'<span class="text-gray-400 italic">Not provided</span>')+'</div></div>';
+            h+='<div class="fb-section"><h4>🎯 Key Focus (This Week)</h4><div class="fb-content">'+(fb.key_focus||'<span class="text-gray-400 italic">Not provided</span>')+'</div></div>';
+            h+='</div></div>';
+        });
+        h+='</div>';
+    }
+    document.getElementById('historyContent').innerHTML=h;
+}
+
+// NAV
 function showPage(page){
     currentPage=page;
     document.querySelectorAll('[id^="page-"]').forEach(p=>p.classList.add('hidden'));
     document.getElementById('page-'+page).classList.remove('hidden');
-    ['board','list','people','summary'].forEach(n=>document.getElementById('nav-'+n).classList.remove('active'));
-    document.getElementById('nav-'+page).classList.add('active');
-    renderAll();
+    ['feedback','feedback-history','board','list','people','summary'].forEach(n=>{const el=document.getElementById('nav-'+n);if(el)el.classList.remove('active');});
+    const navEl=document.getElementById('nav-'+page);if(navEl)navEl.classList.add('active');
+    const isFb=page==='feedback'||page==='feedback-history';
+    document.getElementById('topAddBtn').style.display=isFb?'none':'inline-flex';
+    document.getElementById('topBarTitle').textContent=isFb?'Weekly Feedback':'Action Items';
+    if(page==='feedback'){loadFeedback();}
+    else if(page==='feedback-history'){renderFeedbackHistory();}
+    else{renderAll();}
 }
-function setOwnerFilter(owner){
-    currentOwnerFilter=owner;
-    document.querySelectorAll('.nav-item').forEach(n=>{if(n.id.startsWith('nav-')&&!['nav-board','nav-list','nav-summary'].includes(n.id))n.classList.remove('active');});
-    document.getElementById('nav-'+(owner==='all'?'all':owner)).classList.add('active');
-    renderAll();
-}
-function renderPeople(){
-    let html='';
-    // Multi-owner items first
-    const multiItems=items.filter(i=>(i.owners||[]).length>1);
-    if(multiItems.length){
-        html+='<div class="card overflow-hidden mb-6"><div class="card-header" style="background:linear-gradient(135deg,#eef2ff,#e0e7ff);border-bottom:2px solid #a5b4fc"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="text-lg">👥</span><span class="text-sm font-bold text-indigo-800">Multiple Owners</span></div><span class="badge badge-gray">'+multiItems.length+'</span></div></div><div class="p-3 space-y-2">';
-        multiItems.forEach(i=>{
-            const ownersHtml=(i.owners||[]).map(o=>ownerBadge(o)).join('');
-            const dueHtml=dueBadge(i.dueDate);
-            html+='<div class="flex items-center justify-between py-3 px-4 rounded-lg hover:bg-gray-50 cursor-pointer" onclick="openEditModal(\''+i.id+'\')">'
-                +'<div class="flex-1 mr-3"><div class="text-xs font-semibold text-gray-900">'+i.item+'</div><div class="text-[10px] text-gray-500 mt-0.5">'+i.action+'</div></div>'
-                +'<div class="flex flex-wrap items-center gap-1">'+priorityBadge(i.priority)+statusBadge(i.status)+ownersHtml+(dueHtml?' '+dueHtml:'')+'</div></div>';
-        });
-        html+='</div></div>';
-    }
-    // Per-person sections
-    OWNERS.forEach(o=>{
-        const oi=items.filter(i=>{const ow=i.owners||[i.owner];return ow.length===1&&ow[0]===o;});
-        if(!oi.length)return;
-        const c=OWNER_COLORS[o];
-        html+='<div class="card overflow-hidden mb-4"><div class="card-header" style="border-left:4px solid '+c+'"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full inline-block" style="background:'+c+'"></span><span class="text-sm font-bold text-gray-800">'+o+'</span></div><span class="badge badge-gray">'+oi.length+'</span></div></div><div class="p-3 space-y-2">';
-        oi.forEach(i=>{
-            const dueHtml=dueBadge(i.dueDate);
-            html+='<div class="flex items-center justify-between py-3 px-4 rounded-lg hover:bg-gray-50 cursor-pointer" onclick="openEditModal(\''+i.id+'\')">'
-                +'<div class="flex-1 mr-3"><div class="text-xs font-semibold text-gray-900">'+i.item+'</div><div class="text-[10px] text-gray-500 mt-0.5">'+i.action+'</div></div>'
-                +'<div class="flex flex-wrap items-center gap-1">'+priorityBadge(i.priority)+statusBadge(i.status)+(dueHtml?' '+dueHtml:'')+'</div></div>';
-        });
-        html+='</div></div>';
-    });
-    if(!html)html='<div class="card p-12 text-center text-gray-400 text-sm">No items yet. Add some items to see them grouped by person.</div>';
-    document.getElementById('peopleContent').innerHTML=html;
-}
+function setOwnerFilter(owner){currentOwnerFilter=owner;document.querySelectorAll('.nav-item').forEach(n=>{if(n.id.startsWith('nav-')&&!['nav-feedback','nav-feedback-history','nav-board','nav-list','nav-people','nav-summary'].includes(n.id))n.classList.remove('active');});document.getElementById('nav-'+(owner==='all'?'all':owner)).classList.add('active');renderAll();}
 function renderAll(){renderSummaryCards();if(currentPage==='board')renderBoard();if(currentPage==='list')renderList();if(currentPage==='people')renderPeople();if(currentPage==='summary')renderSummary();}
 
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();if(e.key==='n'&&!e.ctrlKey&&!e.metaKey&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName))openAddModal();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeFbModal();}if(e.key==='n'&&!e.ctrlKey&&!e.metaKey&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName))openAddModal();});
 subscribeRealtime();checkSession();
 </script>
 </body></html>
