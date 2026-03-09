@@ -51,6 +51,14 @@
         .drag-card .card-action{font-size:11px;color:#6b7280;line-height:1.4;margin-bottom:8px}
         .drag-card .card-meta{display:flex;flex-wrap:wrap;gap:4px}
         .login-bg{background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%)}
+        .owner-chip{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:9999px;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;border:2px solid #e5e7eb;background:#fff;color:#374151;user-select:none}
+        .owner-chip:hover{border-color:#d1d5db}
+        .owner-chip.selected{border-color:var(--chip-color);background:color-mix(in srgb,var(--chip-color) 12%,white);color:var(--chip-color);font-weight:600}
+        .owner-chip .chip-dot{width:8px;height:8px;border-radius:50%}
+        .due-badge{font-size:10px;font-weight:500;padding:2px 7px;border-radius:4px}
+        .due-overdue{background:#fef2f2;color:#dc2626}
+        .due-soon{background:#fffbeb;color:#d97706}
+        .due-ok{background:#f3f4f6;color:#6b7280}
     </style>
 </head>
 <body class="min-h-screen font-sans antialiased text-gray-900">
@@ -124,9 +132,10 @@
             <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Action</label><textarea id="f_action" class="input-field w-full" placeholder="What action needs to be taken?" required></textarea></div>
             <div class="grid grid-cols-3 gap-3 mb-3">
                 <div><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Priority</label><select id="f_priority" class="select-field w-full"><option value="High">🔴 High (This Week)</option><option value="Medium">🟡 Medium (Next 2 Weeks)</option><option value="Low">🔵 Low (This Month)</option></select></div>
-                <div><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Owner</label><select id="f_owner" class="select-field w-full"><option value="Don">Don</option><option value="Mark">Mark</option><option value="Kerushan">Kerushan</option><option value="Daryl">Daryl</option><option value="Tunya">Tunya</option><option value="Tim">Tim</option><option value="John">John</option><option value="Greg">Greg</option><option value="Verona">Verona</option></select></div>
                 <div><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Status</label><select id="f_status" class="select-field w-full"><option value="Open">Open</option><option value="In Progress">In Progress</option><option value="Blocked">Blocked</option><option value="Done">Done</option></select></div>
+                <div><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Due Date</label><input type="date" id="f_dueDate" class="input-field w-full"></div>
             </div>
+            <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Owners (click to select multiple)</label><div id="f_owners" class="flex flex-wrap gap-2"></div></div>
             <button type="submit" class="btn btn-accent w-full justify-center"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span id="modalSubmitText">Add Item</span></button>
         </form>
     </div></div>
@@ -137,7 +146,7 @@ const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSI
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const OWNERS=['Don','Mark','Kerushan','Daryl','Tunya','Tim','John','Greg','Verona'];
 const OWNER_COLORS={Don:'#f97316',Mark:'#3b82f6',Kerushan:'#10b981',Daryl:'#8b5cf6',Tunya:'#ec4899',Tim:'#06b6d4',John:'#f43f5e',Greg:'#84cc16',Verona:'#a855f7'};
-let currentUser=null,items=[],currentPage='board',currentOwnerFilter='all',draggedId=null,dropTargetId=null;
+let currentUser=null,items=[],currentPage='board',currentOwnerFilter='all',draggedId=null,dropTargetId=null,selectedOwners=[];
 
 async function handleLogin(e){
     e.preventDefault();
@@ -156,18 +165,47 @@ function showApp(){
     document.getElementById('userAvatar').style.background=currentUser.color;
     document.getElementById('userAvatar').textContent=currentUser.display_name[0];
     document.getElementById('userName').textContent=currentUser.display_name;
+    renderOwnerChips();
     loadItems();
 }
 function checkSession(){const s=sessionStorage.getItem('cx_user');if(s){currentUser=JSON.parse(s);showApp();}}
 
+function renderOwnerChips(){
+    const container=document.getElementById('f_owners');
+    container.innerHTML=OWNERS.map(o=>{
+        const c=OWNER_COLORS[o];
+        return '<div class="owner-chip" style="--chip-color:'+c+'" data-owner="'+o+'" onclick="toggleOwner(this)"><span class="chip-dot" style="background:'+c+'"></span>'+o+'</div>';
+    }).join('');
+}
+function toggleOwner(el){
+    el.classList.toggle('selected');
+    selectedOwners=Array.from(document.querySelectorAll('#f_owners .owner-chip.selected')).map(e=>e.dataset.owner);
+}
+function setSelectedOwners(owners){
+    selectedOwners=owners||[];
+    document.querySelectorAll('#f_owners .owner-chip').forEach(el=>{
+        if(selectedOwners.includes(el.dataset.owner))el.classList.add('selected');
+        else el.classList.remove('selected');
+    });
+}
+
 async function loadItems(){
     const{data,error}=await sb.from('cx_standup_items').select('*').order('sort_order',{ascending:true});
     if(error){console.error('Load error:',error);return;}
-    items=(data||[]).map(r=>({id:r.id,item:r.item,action:r.action,priority:r.priority,owner:r.owner,status:r.status,sortOrder:r.sort_order||0,createdAt:r.created_at}));
+    items=(data||[]).map(r=>({
+        id:r.id,item:r.item,action:r.action,priority:r.priority,
+        owner:r.owner,owners:r.owners||[r.owner],
+        status:r.status,dueDate:r.due_date||null,
+        sortOrder:r.sort_order||0,createdAt:r.created_at
+    }));
     renderAll();
 }
 async function upsertItem(item){
-    const row={id:item.id,item:item.item,action:item.action,priority:item.priority,owner:item.owner,status:item.status,sort_order:item.sortOrder||0,updated_at:new Date().toISOString()};
+    const row={id:item.id,item:item.item,action:item.action,priority:item.priority,
+        owner:item.owners&&item.owners.length?item.owners[0]:item.owner,
+        owners:item.owners||[item.owner],
+        status:item.status,due_date:item.dueDate||null,
+        sort_order:item.sortOrder||0,updated_at:new Date().toISOString()};
     const{error}=await sb.from('cx_standup_items').upsert(row);
     if(error)console.error('Upsert error:',error);
 }
@@ -175,7 +213,7 @@ async function removeItem(id){const{error}=await sb.from('cx_standup_items').del
 
 function getFiltered(){
     let f=[...items];
-    if(currentOwnerFilter!=='all')f=f.filter(i=>i.owner===currentOwnerFilter);
+    if(currentOwnerFilter!=='all')f=f.filter(i=>(i.owners||[i.owner]).includes(currentOwnerFilter));
     return f;
 }
 function subscribeRealtime(){
@@ -185,14 +223,28 @@ function subscribeRealtime(){
 function statusBadge(s){const m={Open:'badge-gray','In Progress':'badge-amber',Blocked:'badge-red',Done:'badge-green'};return '<span class="badge '+m[s]+'">'+s+'</span>';}
 function priorityBadge(p){const m={High:'badge-red',Medium:'badge-amber',Low:'badge-blue'};const i={High:'🔴',Medium:'🟡',Low:'🔵'};return '<span class="badge '+m[p]+'">'+i[p]+' '+p+'</span>';}
 function ownerBadge(o){const c=OWNER_COLORS[o]||'#6b7280';return '<span class="badge" style="background:'+c+'15;color:'+c+'">'+o+'</span>';}
+function ownersBadges(owners){return (owners||[]).map(o=>ownerBadge(o)).join('');}
+
+function dueBadge(d){
+    if(!d)return '';
+    const due=new Date(d+'T00:00:00');
+    const now=new Date();now.setHours(0,0,0,0);
+    const diff=Math.ceil((due-now)/(1000*60*60*24));
+    const label=due.toLocaleDateString('en-ZA',{day:'numeric',month:'short'});
+    if(diff<0)return '<span class="due-badge due-overdue">⚠️ '+label+' (overdue)</span>';
+    if(diff<=3)return '<span class="due-badge due-soon">📅 '+label+' ('+diff+'d)</span>';
+    return '<span class="due-badge due-ok">📅 '+label+'</span>';
+}
 
 function openAddModal(priority){
     document.getElementById('f_id').value='';
     document.getElementById('f_item').value='';
     document.getElementById('f_action').value='';
     document.getElementById('f_priority').value=priority||'High';
-    document.getElementById('f_owner').value=currentUser?currentUser.display_name:'Don';
     document.getElementById('f_status').value='Open';
+    document.getElementById('f_dueDate').value='';
+    renderOwnerChips();
+    setSelectedOwners(currentUser?[currentUser.display_name]:['Don']);
     document.getElementById('modalTitle').textContent='Add New Item';
     document.getElementById('modalSubmitText').textContent='Add Item';
     document.getElementById('modal').classList.remove('hidden');
@@ -204,8 +256,10 @@ function openEditModal(id){
     document.getElementById('f_item').value=item.item;
     document.getElementById('f_action').value=item.action;
     document.getElementById('f_priority').value=item.priority;
-    document.getElementById('f_owner').value=item.owner;
     document.getElementById('f_status').value=item.status;
+    document.getElementById('f_dueDate').value=item.dueDate||'';
+    renderOwnerChips();
+    setSelectedOwners(item.owners||[item.owner]);
     document.getElementById('modalTitle').textContent='Edit Item';
     document.getElementById('modalSubmitText').textContent='Save Changes';
     document.getElementById('modal').classList.remove('hidden');
@@ -215,8 +269,9 @@ function closeModal(){document.getElementById('modal').classList.add('hidden');}
 
 async function saveItem(e){
     e.preventDefault();
+    if(selectedOwners.length===0){alert('Please select at least one owner');return;}
     const id=document.getElementById('f_id').value;
-    const data={item:document.getElementById('f_item').value.trim(),action:document.getElementById('f_action').value.trim(),priority:document.getElementById('f_priority').value,owner:document.getElementById('f_owner').value,status:document.getElementById('f_status').value};
+    const data={item:document.getElementById('f_item').value.trim(),action:document.getElementById('f_action').value.trim(),priority:document.getElementById('f_priority').value,owners:selectedOwners,owner:selectedOwners[0],status:document.getElementById('f_status').value,dueDate:document.getElementById('f_dueDate').value||null};
     if(id){const existing=items.find(i=>i.id===id);await upsertItem({...existing,...data});}
     else{await upsertItem({id:Date.now().toString(),...data,sortOrder:0,createdAt:new Date().toISOString()});}
     closeModal();await loadItems();
@@ -249,6 +304,8 @@ async function handleDrop(e,priority){
 }
 
 function renderCard(item){
+    const ownersHtml=(item.owners||[item.owner]).map(o=>ownerBadge(o)).join('');
+    const dueHtml=dueBadge(item.dueDate);
     return '<div class="drag-card" draggable="true" ondragstart="handleDragStart(event,\''+item.id+'\')" ondragend="handleDragEnd(event)" ondragover="handleCardDragOver(event,\''+item.id+'\')" ondragleave="handleCardDragLeave(event)">'
         +'<div class="flex items-start justify-between gap-2 mb-1">'
         +'<div class="card-title flex-1 cursor-pointer" onclick="openEditModal(\''+item.id+'\')">'+item.item+'</div>'
@@ -257,7 +314,8 @@ function renderCard(item){
         +'<button class="text-gray-400 hover:text-red-600 p-1 rounded hover:bg-red-50 transition-colors" onclick="deleteItem(\''+item.id+'\')" title="Delete"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>'
         +'</div></div>'
         +'<div class="card-action">'+item.action+'</div>'
-        +'<div class="card-meta">'+statusBadge(item.status)+ownerBadge(item.owner)+'</div>'
+        +(dueHtml?'<div class="mb-2">'+dueHtml+'</div>':'')
+        +'<div class="card-meta">'+statusBadge(item.status)+ownersHtml+'</div>'
         +'</div>';
 }
 
@@ -273,8 +331,9 @@ function renderBoard(){
 function renderSummaryCards(){
     const high=items.filter(i=>i.priority==='High'),med=items.filter(i=>i.priority==='Medium'),low=items.filter(i=>i.priority==='Low');
     const open=items.filter(i=>i.status==='Open').length,prog=items.filter(i=>i.status==='In Progress').length;
+    const overdue=items.filter(i=>{if(!i.dueDate)return false;const d=new Date(i.dueDate+'T00:00:00');const n=new Date();n.setHours(0,0,0,0);return d<n&&i.status!=='Done';}).length;
     document.getElementById('summaryCards').innerHTML=
-        '<div class="stat-card text-center" style="border-left:4px solid #6366f1"><p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Items</p><p class="text-2xl font-bold text-indigo-600 mt-1">'+items.length+'</p><p class="text-xs text-gray-400 mt-1">'+open+' open · '+prog+' in progress</p></div>'
+        '<div class="stat-card text-center" style="border-left:4px solid #6366f1"><p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Items</p><p class="text-2xl font-bold text-indigo-600 mt-1">'+items.length+'</p><p class="text-xs text-gray-400 mt-1">'+open+' open · '+prog+' in progress'+(overdue?' · <span class="text-red-500">'+overdue+' overdue</span>':'')+'</p></div>'
         +'<div class="stat-card text-center" style="border-left:4px solid #ef4444"><p class="text-xs font-medium text-gray-500 uppercase tracking-wide">🔴 High</p><p class="text-2xl font-bold text-red-600 mt-1">'+high.length+'</p><p class="text-xs text-gray-400 mt-1">This Week</p></div>'
         +'<div class="stat-card text-center" style="border-left:4px solid #f59e0b"><p class="text-xs font-medium text-gray-500 uppercase tracking-wide">🟡 Medium</p><p class="text-2xl font-bold text-amber-600 mt-1">'+med.length+'</p><p class="text-xs text-gray-400 mt-1">Next 2 Weeks</p></div>'
         +'<div class="stat-card text-center" style="border-left:4px solid #3b82f6"><p class="text-xs font-medium text-gray-500 uppercase tracking-wide">🔵 Low</p><p class="text-2xl font-bold text-blue-600 mt-1">'+low.length+'</p><p class="text-xs text-gray-400 mt-1">This Month</p></div>';
@@ -285,15 +344,17 @@ function renderList(){
     const sf=document.getElementById('listStatusFilter').value,pf=document.getElementById('listPriorityFilter').value,of2=document.getElementById('listOwnerFilter').value;
     if(sf!=='all')filtered=filtered.filter(i=>i.status===sf);
     if(pf!=='all')filtered=filtered.filter(i=>i.priority===pf);
-    if(of2!=='all')filtered=filtered.filter(i=>i.owner===of2);
+    if(of2!=='all')filtered=filtered.filter(i=>(i.owners||[i.owner]).includes(of2));
     if(!filtered.length){document.getElementById('listContainer').innerHTML='<div class="card p-12 text-center text-gray-400 text-sm">No items match your filters.</div>';return;}
     let html='<div class="space-y-3">';
     filtered.forEach(item=>{
+        const ownersHtml=(item.owners||[item.owner]).map(o=>ownerBadge(o)).join('');
+        const dueHtml=dueBadge(item.dueDate);
         html+='<div class="card p-5"><div class="flex items-start justify-between gap-4 mb-3"><div class="flex-1 cursor-pointer" onclick="openEditModal(\''+item.id+'\')">'
             +'<div class="text-sm font-semibold text-gray-900">'+item.item+'</div>'
             +'<div class="text-xs text-gray-500 mt-1 leading-relaxed">'+item.action+'</div></div>'
             +'<button class="btn-danger" onclick="deleteItem(\''+item.id+'\')"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div>'
-            +'<div class="flex flex-wrap gap-2 items-center">'+priorityBadge(item.priority)+statusBadge(item.status)+ownerBadge(item.owner)+'</div></div>';
+            +'<div class="flex flex-wrap gap-2 items-center">'+priorityBadge(item.priority)+statusBadge(item.status)+ownersHtml+(dueHtml?' '+dueHtml:'')+'</div></div>';
     });
     html+='</div>';
     document.getElementById('listContainer').innerHTML=html;
@@ -307,13 +368,13 @@ function renderSummary(){
         const pi=items.filter(i=>i.priority===p);
         html+='<div class="card overflow-hidden"><div class="card-header" style="background:'+(p==='High'?'#fef2f2':p==='Medium'?'#fffbeb':'#eff6ff')+'"><div class="flex items-center justify-between"><span class="text-sm font-bold text-gray-800">'+p+' Priority</span><span class="badge badge-'+priColor[p]+'">'+pi.length+'</span></div></div><div class="p-3 space-y-2">';
         if(!pi.length)html+='<p class="text-xs text-gray-400 text-center py-4">No items</p>';
-        else pi.forEach(i=>{html+='<div class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50"><span class="text-xs text-gray-700 flex-1">'+i.item+'</span>'+ownerBadge(i.owner)+'</div>';});
+        else pi.forEach(i=>{html+='<div class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50"><span class="text-xs text-gray-700 flex-1">'+i.item+'</span><div class="flex gap-1">'+(i.owners||[i.owner]).map(o=>ownerBadge(o)).join('')+'</div></div>';});
         html+='</div></div>';
     });
     html+='</div>';
     html+='<div class="grid grid-cols-3 gap-6 mb-6">';
     OWNERS.forEach(o=>{
-        const oi=items.filter(i=>i.owner===o);
+        const oi=items.filter(i=>(i.owners||[i.owner]).includes(o));
         if(!oi.length)return;
         const c=OWNER_COLORS[o];
         html+='<div class="card overflow-hidden"><div class="card-header"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full inline-block" style="background:'+c+'"></span><span class="text-sm font-semibold text-gray-800">'+o+'</span></div><span class="badge badge-gray">'+oi.length+'</span></div></div><div class="p-3 space-y-2">';
