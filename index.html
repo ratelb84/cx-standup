@@ -468,11 +468,13 @@ function renderDashboard(){
 
 // ==================== ADMIN ====================
 async function loadAllUsers(){
-    const{data}=await sb.from('cx_standup_users').select('*').order('display_name');
+    const{data,error}=await sb.from('cx_standup_users').select('*').order('display_name');
+    if(error){console.error('loadAllUsers error:',error);return;}
     allUsers=data||[];
-    if(currentPage==='admin')renderAdminUsers();
+    renderAdminUsers();
 }
 function renderAdminUsers(){
+    if(!document.getElementById('adminUsersList'))return;
     const active=allUsers.filter(u=>u.enabled!==false).length;
     const disabled=allUsers.filter(u=>u.enabled===false).length;
     document.getElementById('adminStats').innerHTML='<div class="stat-card" style="border-left:4px solid #10b981;padding:10px 16px"><span class="text-xs text-gray-500">Active</span><span class="text-lg font-bold text-green-600 ml-2">'+active+'</span></div><div class="stat-card" style="border-left:4px solid #ef4444;padding:10px 16px"><span class="text-xs text-gray-500">Disabled</span><span class="text-lg font-bold text-red-600 ml-2">'+disabled+'</span></div><div class="stat-card" style="border-left:4px solid #6366f1;padding:10px 16px"><span class="text-xs text-gray-500">Total</span><span class="text-lg font-bold text-indigo-600 ml-2">'+allUsers.length+'</span></div>';
