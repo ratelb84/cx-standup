@@ -468,10 +468,17 @@ function renderDashboard(){
 
 // ==================== ADMIN ====================
 async function loadAllUsers(){
-    const{data,error}=await sb.from('cx_standup_users').select('*').order('display_name');
-    if(error){console.error('loadAllUsers error:',error);return;}
-    allUsers=data||[];
-    renderAdminUsers();
+    try{
+        var res=await sb.from('cx_standup_users').select('*').order('display_name');
+        if(res.error){
+            document.getElementById('adminUsersList').innerHTML='<p class="text-sm text-red-600 p-4">Error: '+res.error.message+'</p>';
+            return;
+        }
+        allUsers=res.data||[];
+        renderAdminUsers();
+    }catch(e){
+        document.getElementById('adminUsersList').innerHTML='<p class="text-sm text-red-600 p-4">Exception: '+e.message+'</p>';
+    }
 }
 function renderAdminUsers(){
     var el=document.getElementById('adminUsersList');
