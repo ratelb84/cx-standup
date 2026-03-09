@@ -9,50 +9,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
-    <!-- PROJECT MODAL -->
-<div id="projModal" class="fixed inset-0 z-50 hidden" onclick="if(event.target===this)closeProjModal()">
-    <div class="absolute inset-0 bg-black/30"></div>
-    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg"><div class="card p-6" style="max-height:90vh;overflow-y:auto">
-        <div class="flex items-center justify-between mb-4"><h3 class="text-base font-semibold text-gray-900" id="projModalTitle">Add Project</h3><button class="btn-danger" onclick="closeProjModal()"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div>
-        <input type="hidden" id="p_id">
-        <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Project Name *</label><input type="text" id="p_name" class="input-field w-full" placeholder="Project name"></div>
-        <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Description</label><textarea id="p_description" class="input-field w-full" placeholder="What does this project do?"></textarea></div>
-        <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Expected Outcome</label><textarea id="p_outcome" class="input-field w-full" placeholder="What is the expected result/benefit?"></textarea></div>
-        <div class="grid grid-cols-2 gap-3 mb-3"><div><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Status</label><select id="p_status" class="select-field w-full"><option value="Active">Active</option><option value="On Hold">On Hold</option><option value="Complete">Complete</option><option value="Cancelled">Cancelled</option></select></div><div><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Due Date *</label><input type="date" id="p_dueDate" class="input-field w-full"></div></div>
-        <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Owner(s) *</label><div id="p_owners" class="flex flex-wrap gap-2"></div></div>
-        <div class="mb-3" id="projCommentsSection" style="display:none"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Comments</label><div id="projCommentsList" class="comment-list"></div><div class="comment-add"><input type="text" id="p_newComment" class="input-field flex-1" placeholder="Add a comment..." onkeydown="if(event.key==='Enter'){event.preventDefault();addProjectComment();}"><button type="button" class="btn btn-accent text-xs" onclick="addProjectComment()" style="padding:7px 12px">Add</button></div></div>
-        <button type="button" class="btn btn-accent w-full justify-center" onclick="saveProject()"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span id="projSubmitText">Add Project</span></button>
-    </div></div>
-</div>
-<!-- USER ADMIN MODAL -->
-<div id="userModal" class="fixed inset-0 z-50 hidden" onclick="if(event.target===this)closeUserModal()">
-    <div class="absolute inset-0 bg-black/30"></div>
-    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm"><div class="card p-6">
-        <div class="flex items-center justify-between mb-4"><h3 class="text-base font-semibold text-gray-900" id="userModalTitle">Add User</h3><button class="btn-danger" onclick="closeUserModal()"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div>
-        <input type="hidden" id="u_editing">
-        <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Display Name *</label><input type="text" id="u_name" class="input-field w-full" placeholder="e.g. Sarah"></div>
-        <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Username *</label><input type="text" id="u_username" class="input-field w-full" placeholder="e.g. sarah (lowercase)"></div>
-        <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Password *</label><input type="text" id="u_password" class="input-field w-full" placeholder="e.g. Sarah123!"></div>
-        <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Color</label><input type="color" id="u_color" class="input-field w-full" value="#6366f1" style="height:38px;padding:4px"></div>
-        <button type="button" class="btn btn-accent w-full justify-center" onclick="saveUser()"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span id="userSubmitText">Add User</span></button>
-    </div></div>
-</div>
-<!-- RISK MODAL -->
-<div id="riskModal" class="fixed inset-0 z-50 hidden" onclick="if(event.target===this)closeRiskModal()">
-    <div class="absolute inset-0 bg-black/30"></div>
-    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg"><div class="card p-6" style="max-height:90vh;overflow-y:auto">
-        <div class="flex items-center justify-between mb-4"><h3 class="text-base font-semibold text-gray-900" id="riskModalTitle">Add Risk</h3><button class="btn-danger" onclick="closeRiskModal()"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div>
-        <input type="hidden" id="r_id">
-        <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Risk Item *</label><input type="text" id="r_item" class="input-field w-full" placeholder="What is the risk?"></div>
-        <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Description</label><textarea id="r_description" class="input-field w-full" placeholder="Describe the risk in detail..."></textarea></div>
-        <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Impact</label><textarea id="r_impact" class="input-field w-full" placeholder="What is the potential impact?"></textarea></div>
-        <div class="grid grid-cols-2 gap-3 mb-3"><div><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Risk Level *</label><select id="r_risk" class="select-field w-full"><option value="High">🔴 High</option><option value="Medium">🟡 Medium</option><option value="Low">🔵 Low</option></select></div><div><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Status</label><select id="r_status" class="select-field w-full"><option value="Open">Open</option><option value="Mitigating">Mitigating</option><option value="Closed">Closed</option><option value="Accepted">Accepted</option></select></div></div>
-        <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Owner(s) *</label><div id="r_owners" class="flex flex-wrap gap-2"></div></div>
-        <div class="mb-3" id="riskCommentsSection" style="display:none"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Comments</label><div id="riskCommentsList" class="comment-list"></div><div class="comment-add"><input type="text" id="r_newComment" class="input-field flex-1" placeholder="Add a comment..." onkeydown="if(event.key==='Enter'){event.preventDefault();addRiskComment();}"><button type="button" class="btn btn-accent text-xs" onclick="addRiskComment()" style="padding:7px 12px">Add</button></div></div>
-        <button type="button" class="btn btn-accent w-full justify-center" onclick="saveRisk()"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span id="riskSubmitText">Add Risk</span></button>
-    </div></div>
-</div>
-<script>tailwind.config={theme:{extend:{fontFamily:{sans:['Poppins','system-ui','sans-serif']}}}}</script>
+    <script>tailwind.config={theme:{extend:{fontFamily:{sans:['Poppins','system-ui','sans-serif']}}}}</script>
     <style>
         body{background:#edeff2}.sidebar{background:#1a1a2e}
         .nav-item{color:rgba(255,255,255,0.6);transition:all .15s;font-size:13px;padding:8px 16px;border-radius:6px;display:flex;align-items:center;gap:10px;cursor:pointer;margin:1px 8px}
