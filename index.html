@@ -621,14 +621,15 @@ function showPage(page){
     const isFb=page==='feedback'||page==='feedback-history';
     const isPR=page==='projects'||page==='risks';
     const isDash=page==='dashboard';
-    document.getElementById('topAddBtn').style.display=(isFb||isPR||isDash)?'none':'inline-flex';
-    document.getElementById('topBarTitle').textContent=isDash?'Dashboard':isFb?'Weekly Feedback':isPR?(page==='projects'?'AI / Automation Projects':'Risk Register'):'Action Items';
+    const isAdmin=page==='admin';
+    document.getElementById('topAddBtn').style.display=(isFb||isPR||isDash||isAdmin)?'none':'inline-flex';
+    document.getElementById('topBarTitle').textContent=isDash?'Dashboard':isFb?'Weekly Feedback':isPR?(page==='projects'?'AI / Automation Projects':'Risk Register'):isAdmin?'User Management':'Action Items';
     if(page==='dashboard'){renderDashboard();}
     else if(page==='feedback'){loadFeedback();}
     else if(page==='feedback-history'){renderFeedbackHistory();}
     else if(page==='projects'){loadProjects();}
     else if(page==='risks'){loadRisks();}
-    else if(page==='admin'){if(currentUser&&currentUser.is_admin)loadAllUsers();}
+    else if(page==='admin'){if(currentUser&&currentUser.is_admin){if(allUsers.length)renderAdminUsers();loadAllUsers();}}
     else{renderAll();}
 }
 function setOwnerFilter(owner){currentOwnerFilter=owner;document.querySelectorAll('.nav-item').forEach(n=>{if(n.id.startsWith('nav-')&&!['nav-feedback','nav-feedback-history','nav-board','nav-list','nav-people','nav-summary'].includes(n.id))n.classList.remove('active');});document.getElementById('nav-'+(owner==='all'?'all':owner)).classList.add('active');renderAll();}
