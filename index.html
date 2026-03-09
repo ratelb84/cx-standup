@@ -474,28 +474,34 @@ async function loadAllUsers(){
     renderAdminUsers();
 }
 function renderAdminUsers(){
-    if(!document.getElementById('adminUsersList'))return;
-    const active=allUsers.filter(u=>u.enabled!==false).length;
-    const disabled=allUsers.filter(u=>u.enabled===false).length;
-    document.getElementById('adminStats').innerHTML='<div class="stat-card" style="border-left:4px solid #10b981;padding:10px 16px"><span class="text-xs text-gray-500">Active</span><span class="text-lg font-bold text-green-600 ml-2">'+active+'</span></div><div class="stat-card" style="border-left:4px solid #ef4444;padding:10px 16px"><span class="text-xs text-gray-500">Disabled</span><span class="text-lg font-bold text-red-600 ml-2">'+disabled+'</span></div><div class="stat-card" style="border-left:4px solid #6366f1;padding:10px 16px"><span class="text-xs text-gray-500">Total</span><span class="text-lg font-bold text-indigo-600 ml-2">'+allUsers.length+'</span></div>';
-    let h='<div class="space-y-2">';
-    allUsers.forEach(u=>{
-        const isDisabled=u.enabled===false;
-        const isAdmin=u.is_admin===true;
-        h+='<div class="card p-4'+(isDisabled?' opacity-50':'')+'" style="border-left:4px solid '+(u.color||'#6b7280')+'">';
+    var el=document.getElementById('adminUsersList');
+    var statEl=document.getElementById('adminStats');
+    if(!el||!statEl){console.log('Admin elements not found');return;}
+    if(!allUsers||!allUsers.length){el.innerHTML='<div class="card p-12 text-center text-gray-400 text-sm">Loading users...</div>';return;}
+    var active=allUsers.filter(function(u){return u.enabled!==false;}).length;
+    var disabled=allUsers.filter(function(u){return u.enabled===false;}).length;
+    statEl.innerHTML='<div class="stat-card" style="border-left:4px solid #10b981;padding:10px 16px"><span class="text-xs text-gray-500">Active</span><span class="text-lg font-bold text-green-600 ml-2">'+active+'</span></div><div class="stat-card" style="border-left:4px solid #ef4444;padding:10px 16px"><span class="text-xs text-gray-500">Disabled</span><span class="text-lg font-bold text-red-600 ml-2">'+disabled+'</span></div><div class="stat-card" style="border-left:4px solid #6366f1;padding:10px 16px"><span class="text-xs text-gray-500">Total</span><span class="text-lg font-bold text-indigo-600 ml-2">'+allUsers.length+'</span></div>';
+    var h='<div class="space-y-2">';
+    for(var i=0;i<allUsers.length;i++){
+        var u=allUsers[i];
+        var isDisabled=u.enabled===false;
+        var isAdm=u.is_admin===true;
+        var dn=u.display_name||u.username;
+        var col=u.color||'#6b7280';
+        h+='<div class="card p-4'+(isDisabled?' opacity-50':'')+'" style="border-left:4px solid '+col+'">';
         h+='<div class="flex items-center justify-between"><div class="flex items-center gap-3">';
-        h+='<div class="h-8 w-8 rounded-full flex items-center justify-center text-white text-xs font-semibold" style="background:'+(u.color||'#6b7280')+'">'+u.display_name[0]+'</div>';
-        h+='<div><div class="text-sm font-semibold text-gray-900">'+u.display_name+(isAdmin?' <span class="badge badge-purple text-[9px]">Admin</span>':'')+(isDisabled?' <span class="badge badge-red text-[9px]">Disabled</span>':'')+'</div>';
-        h+='<div class="text-xs text-gray-500">@'+u.username+' · '+u.password+'</div></div></div>';
+        h+='<div class="h-8 w-8 rounded-full flex items-center justify-center text-white text-xs font-semibold" style="background:'+col+'">'+dn.charAt(0)+'</div>';
+        h+='<div><div class="text-sm font-semibold text-gray-900">'+dn+(isAdm?' <span class="badge badge-purple text-[9px]">Admin</span>':'')+(isDisabled?' <span class="badge badge-red text-[9px]">Disabled</span>':'')+'</div>';
+        h+='<div class="text-xs text-gray-500">@'+u.username+' &middot; '+u.password+'</div></div></div>';
         h+='<div class="flex items-center gap-2">';
         h+='<button class="btn text-xs" style="background:#f3f4f6;color:#374151;padding:5px 10px" onclick="openEditUser(\''+u.username+'\')">Edit</button>';
         if(!isDisabled)h+='<button class="btn text-xs" style="background:#fef2f2;color:#dc2626;padding:5px 10px" onclick="toggleUserEnabled(\''+u.username+'\',false)">Disable</button>';
         else h+='<button class="btn text-xs" style="background:#ecfdf5;color:#059669;padding:5px 10px" onclick="toggleUserEnabled(\''+u.username+'\',true)">Enable</button>';
-        if(!isAdmin)h+='<button class="btn-danger text-xs" onclick="deleteUser(\''+u.username+'\')"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>';
+        if(!isAdm)h+='<button class="btn-danger text-xs" onclick="deleteUser(\''+u.username+'\')"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>';
         h+='</div></div></div>';
-    });
+    }
     h+='</div>';
-    document.getElementById('adminUsersList').innerHTML=h;
+    el.innerHTML=h;
 }
 function openUserModal(){document.getElementById('u_editing').value='';document.getElementById('u_name').value='';document.getElementById('u_username').value='';document.getElementById('u_username').disabled=false;document.getElementById('u_password').value='';document.getElementById('u_color').value='#6366f1';document.getElementById('userModalTitle').textContent='Add User';document.getElementById('userSubmitText').textContent='Add User';document.getElementById('userModal').classList.remove('hidden');document.getElementById('u_name').focus();}
 function openEditUser(username){const u=allUsers.find(x=>x.username===username);if(!u)return;document.getElementById('u_editing').value=username;document.getElementById('u_name').value=u.display_name;document.getElementById('u_username').value=u.username;document.getElementById('u_username').disabled=true;document.getElementById('u_password').value=u.password;document.getElementById('u_color').value=u.color||'#6366f1';document.getElementById('userModalTitle').textContent='Edit User';document.getElementById('userSubmitText').textContent='Save Changes';document.getElementById('userModal').classList.remove('hidden');}
