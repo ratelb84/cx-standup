@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <title>CX Standup</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script>tailwind.config={theme:{extend:{fontFamily:{sans:['Poppins','system-ui','sans-serif']}}}}</script>
+    <style>
+        body{background:#edeff2}.sidebar{background:#1a1a2e}
+        .nav-item{color:rgba(255,255,255,0.6);transition:all .15s;font-size:13px;padding:8px 16px;border-radius:6px;display:flex;align-items:center;gap:10px;cursor:pointer;margin:1px 8px}
+        .nav-item:hover{color:#fff;background:rgba(99,102,241,0.15)}
+        .nav-item.active{color:#818cf8;background:rgba(99,102,241,0.12)}
+        .nav-item svg{width:18px;height:18px;opacity:0.6}.nav-item.active svg{opacity:1}
+        .card{background:#fff;border:1px solid #e5e7eb;border-radius:12px}
+        .card-header{padding:20px 24px;border-bottom:1px solid #f0f0f0}
+        .stat-card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:16px 20px}
+        .badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;padding:3px 10px;border-radius:9999px}
+        .badge-green{background:#ecfdf5;color:#059669}.badge-amber{background:#fffbeb;color:#d97706}
+        .badge-red{background:#fef2f2;color:#dc2626}.badge-blue{background:#eff6ff;color:#2563eb}
+        .badge-purple{background:#f3e8ff;color:#7e22ce}.badge-gray{background:#f3f4f6;color:#6b7280}
+        .btn{font-size:13px;font-weight:500;padding:8px 16px;border-radius:8px;cursor:pointer;transition:all .15s;border:none;display:inline-flex;align-items:center;gap:6px}
+        .btn-accent{background:#6366f1;color:#fff}.btn-accent:hover{background:#4f46e5}
+        .btn-danger{color:#dc2626;background:transparent;padding:4px 8px;font-size:12px;cursor:pointer}
+        .btn-danger:hover{background:#fef2f2;border-radius:6px}
+        .input-field{background:#fff;border:1px solid #d1d5db;border-radius:6px;padding:7px 12px;font-size:13px;color:#111827;outline:none;font-family:inherit}
+        .input-field:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,0.1)}
+        .select-field{background:#fff;border:1px solid #d1d5db;border-radius:8px;padding:7px 12px;font-size:13px;color:#111827;outline:none;font-family:inherit;cursor:pointer}
+        .select-field:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,0.1)}
+        .topbar{background:#fff;border-bottom:1px solid #e5e7eb}
+        .scroll-area::-webkit-scrollbar{width:6px}.scroll-area::-webkit-scrollbar-track{background:transparent}
+        .scroll-area::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:3px}
+        textarea.input-field{resize:vertical;min-height:56px}
+        .lane{background:#f3f4f6;border-radius:12px;min-height:400px;display:flex;flex-direction:column}
+        .lane-header{padding:16px 20px;border-radius:12px 12px 0 0}
+        .lane-high .lane-header{background:linear-gradient(135deg,#fef2f2,#fee2e2);border-bottom:2px solid #fca5a5}
+        .lane-medium .lane-header{background:linear-gradient(135deg,#fffbeb,#fef3c7);border-bottom:2px solid #fcd34d}
+        .lane-low .lane-header{background:linear-gradient(135deg,#eff6ff,#dbeafe);border-bottom:2px solid #93c5fd}
+        .lane-body{padding:12px;flex:1;min-height:200px}
+        .lane-body.drag-over{background:rgba(99,102,241,0.08);border-radius:0 0 12px 12px}
+        .drag-card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:14px 16px;margin-bottom:10px;cursor:grab;transition:all .15s}
+        .drag-card:hover{box-shadow:0 2px 8px rgba(0,0,0,0.08);border-color:#d1d5db}
+        .drag-card:active{cursor:grabbing}
+        .drag-card.dragging{opacity:0.4;transform:rotate(2deg)}
+        .drag-card.drop-before{border-top:3px solid #6366f1;margin-top:-2px}
+        .drag-card.drop-after{border-bottom:3px solid #6366f1;margin-bottom:-2px}
+        .drag-card .card-title{font-size:13px;font-weight:600;color:#111827;margin-bottom:6px}
+        .drag-card .card-action{font-size:11px;color:#6b7280;line-height:1.4;margin-bottom:8px}
+        .drag-card .card-meta{display:flex;flex-wrap:wrap;gap:4px}
+        .login-bg{background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%)}
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased text-gray-900">
+<div id="loginScreen" class="login-bg min-h-screen flex items-center justify-center">
+    <div class="card p-8 w-full max-w-sm">
+        <div class="text-center mb-6">
+            <div class="mx-auto mb-3 w-10 h-10 rounded-lg bg-indigo-600 flex items-center justify-center"><svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
+            <h1 class="text-xl font-bold text-gray-900">CX Standup</h1>
+            <p class="text-xs text-gray-500 mt-1">Sign in to continue</p>
+        </div>
+        <form onsubmit="handleLogin(event)">
+            <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Username</label><input type="text" id="loginUser" class="input-field w-full" placeholder="Enter username" required autofocus></div>
+            <div class="mb-4"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Password</label><input type="password" id="loginPass" class="input-field w-full" placeholder="Enter password" required></div>
+            <div id="loginError" class="text-xs text-red-600 mb-3 hidden"></div>
+            <button type="submit" class="btn btn-accent w-full justify-center">Sign In</button>
+        </form>
+    </div>
+</div>
+<div id="mainApp" class="hidden"><div class="flex min-h-screen">
+    <nav class="sidebar w-60 flex flex-col flex-shrink-0 min-h-screen">
+        <div class="px-4 py-5 border-b border-white/10 flex items-center gap-3 justify-center"><div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div><span class="text-sm font-bold text-white">CX Standup</span></div>
+        <div class="flex-1 py-4 space-y-0.5">
+            <div class="px-4 pb-1"><p class="text-[10px] font-semibold uppercase tracking-wider text-gray-500">Views</p></div>
+            <div onclick="showPage('board')" class="nav-item active" id="nav-board"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125z"/></svg>Priority Board</div>
+            <div onclick="showPage('list')" class="nav-item" id="nav-list"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>List View</div>
+            <div onclick="showPage('summary')" class="nav-item" id="nav-summary"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>Summary</div>
+            <div class="px-4 pt-5 pb-1"><p class="text-[10px] font-semibold uppercase tracking-wider text-gray-500">Filter by Owner</p></div>
+            <div onclick="setOwnerFilter('all')" class="nav-item active" id="nav-all"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>All</div>
+            <div onclick="setOwnerFilter('Don')" class="nav-item" id="nav-Don"><span class="inline-block w-2.5 h-2.5 rounded-full ml-0.5 mr-1" style="background:#f97316"></span>Don</div>
+            <div onclick="setOwnerFilter('Mark')" class="nav-item" id="nav-Mark"><span class="inline-block w-2.5 h-2.5 rounded-full ml-0.5 mr-1" style="background:#3b82f6"></span>Mark</div>
+            <div onclick="setOwnerFilter('Kerushan')" class="nav-item" id="nav-Kerushan"><span class="inline-block w-2.5 h-2.5 rounded-full ml-0.5 mr-1" style="background:#10b981"></span>Kerushan</div>
+            <div onclick="setOwnerFilter('Daryl')" class="nav-item" id="nav-Daryl"><span class="inline-block w-2.5 h-2.5 rounded-full ml-0.5 mr-1" style="background:#8b5cf6"></span>Daryl</div>
+            <div onclick="setOwnerFilter('Tunya')" class="nav-item" id="nav-Tunya"><span class="inline-block w-2.5 h-2.5 rounded-full ml-0.5 mr-1" style="background:#ec4899"></span>Tunya</div>
+            <div onclick="setOwnerFilter('Tim')" class="nav-item" id="nav-Tim"><span class="inline-block w-2.5 h-2.5 rounded-full ml-0.5 mr-1" style="background:#06b6d4"></span>Tim</div>
+            <div onclick="setOwnerFilter('John')" class="nav-item" id="nav-John"><span class="inline-block w-2.5 h-2.5 rounded-full ml-0.5 mr-1" style="background:#f43f5e"></span>John</div>
+            <div onclick="setOwnerFilter('Greg')" class="nav-item" id="nav-Greg"><span class="inline-block w-2.5 h-2.5 rounded-full ml-0.5 mr-1" style="background:#84cc16"></span>Greg</div>
+            <div onclick="setOwnerFilter('Verona')" class="nav-item" id="nav-Verona"><span class="inline-block w-2.5 h-2.5 rounded-full ml-0.5 mr-1" style="background:#a855f7"></span>Verona</div>
+        </div>
+        <div class="px-4 py-3 border-t border-white/10"><div class="flex items-center justify-between"><p class="text-[10px] text-gray-500">CX Standup v1.0</p><button onclick="handleLogout()" class="text-[10px] text-gray-500 hover:text-red-400 cursor-pointer">Logout</button></div></div>
+    </nav>
+    <main class="flex-1 overflow-y-auto scroll-area">
+        <div class="topbar flex items-center justify-between px-8 py-3 sticky top-0 z-10"><h2 class="text-sm font-semibold text-gray-800">CX Standup</h2><div class="flex items-center gap-4"><button class="btn btn-accent text-xs" onclick="openAddModal()"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Add Item</button><div class="h-5 w-px bg-gray-200"></div><div class="flex items-center gap-2"><div id="userAvatar" class="h-7 w-7 rounded-full flex items-center justify-center text-white text-xs font-semibold"></div><span id="userName" class="text-xs font-medium text-gray-700"></span></div></div></div>
+        <div id="page-board" class="p-8">
+            <div class="mb-6"><h1 class="text-2xl font-bold text-gray-900">Priority Board</h1><p class="text-sm text-gray-500 mt-1">Drag items between lanes to reprioritize.</p></div>
+            <div class="grid grid-cols-4 gap-4 mb-6" id="summaryCards"></div>
+            <div class="grid grid-cols-3 gap-6">
+                <div class="lane lane-high" ondragover="handleDragOver(event)" ondrop="handleDrop(event,'High')" ondragleave="handleDragLeave(event)"><div class="lane-header"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="text-lg">🔴</span><div><p class="text-sm font-bold text-red-800">HIGH</p><p class="text-[10px] text-red-600 font-medium">This Week</p></div></div><span class="badge badge-red" id="count-High">0</span></div></div><div class="lane-body" id="body-High"></div></div>
+                <div class="lane lane-medium" ondragover="handleDragOver(event)" ondrop="handleDrop(event,'Medium')" ondragleave="handleDragLeave(event)"><div class="lane-header"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="text-lg">🟡</span><div><p class="text-sm font-bold text-amber-800">MEDIUM</p><p class="text-[10px] text-amber-600 font-medium">Next 2 Weeks</p></div></div><span class="badge badge-amber" id="count-Medium">0</span></div></div><div class="lane-body" id="body-Medium"></div></div>
+                <div class="lane lane-low" ondragover="handleDragOver(event)" ondrop="handleDrop(event,'Low')" ondragleave="handleDragLeave(event)"><div class="lane-header"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="text-lg">🔵</span><div><p class="text-sm font-bold text-blue-800">LOW</p><p class="text-[10px] text-blue-600 font-medium">This Month</p></div></div><span class="badge badge-blue" id="count-Low">0</span></div></div><div class="lane-body" id="body-Low"></div></div>
+            </div>
+        </div>
+        <div id="page-list" class="p-8 hidden">
+            <div class="mb-6"><h1 class="text-2xl font-bold text-gray-900">All Items</h1><p class="text-sm text-gray-500 mt-1">Full list of CX standup items</p></div>
+            <div class="flex items-center gap-4 mb-6">
+                <div class="flex items-center gap-2"><span class="text-xs text-gray-500">Status</span><select id="listStatusFilter" onchange="renderList()" class="select-field text-sm"><option value="all">All</option><option value="Open">Open</option><option value="In Progress">In Progress</option><option value="Blocked">Blocked</option><option value="Done">Done</option></select></div>
+                <div class="flex items-center gap-2"><span class="text-xs text-gray-500">Priority</span><select id="listPriorityFilter" onchange="renderList()" class="select-field text-sm"><option value="all">All</option><option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option></select></div>
+                <div class="flex items-center gap-2"><span class="text-xs text-gray-500">Owner</span><select id="listOwnerFilter" onchange="renderList()" class="select-field text-sm"><option value="all">All</option><option value="Don">Don</option><option value="Mark">Mark</option><option value="Kerushan">Kerushan</option><option value="Daryl">Daryl</option><option value="Tunya">Tunya</option><option value="Tim">Tim</option><option value="John">John</option><option value="Greg">Greg</option><option value="Verona">Verona</option></select></div>
+            </div>
+            <div id="listContainer"></div>
+        </div>
+        <div id="page-summary" class="p-8 hidden"><div class="mb-6"><h1 class="text-2xl font-bold text-gray-900">Summary</h1><p class="text-sm text-gray-500 mt-1">Overview by owner, priority, and status</p></div><div id="summaryContent"></div></div>
+    </main>
+</div></div>
+<div id="modal" class="fixed inset-0 z-50 hidden" onclick="if(event.target===this)closeModal()">
+    <div class="absolute inset-0 bg-black/30"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg"><div class="card p-6">
+        <div class="flex items-center justify-between mb-4"><h3 class="text-base font-semibold text-gray-900" id="modalTitle">Add New Item</h3><button class="btn-danger" onclick="closeModal()"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div>
+        <form id="itemForm" onsubmit="saveItem(event)">
+            <input type="hidden" id="f_id">
+            <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Item Description</label><input type="text" id="f_item" class="input-field w-full" placeholder="What is the item?" required></div>
+            <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Action</label><textarea id="f_action" class="input-field w-full" placeholder="What action needs to be taken?" required></textarea></div>
+            <div class="grid grid-cols-3 gap-3 mb-3">
+                <div><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Priority</label><select id="f_priority" class="select-field w-full"><option value="High">🔴 High (This Week)</option><option value="Medium">🟡 Medium (Next 2 Weeks)</option><option value="Low">🔵 Low (This Month)</option></select></div>
+                <div><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Owner</label><select id="f_owner" class="select-field w-full"><option value="Don">Don</option><option value="Mark">Mark</option><option value="Kerushan">Kerushan</option><option value="Daryl">Daryl</option><option value="Tunya">Tunya</option><option value="Tim">Tim</option><option value="John">John</option><option value="Greg">Greg</option><option value="Verona">Verona</option></select></div>
+                <div><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Status</label><select id="f_status" class="select-field w-full"><option value="Open">Open</option><option value="In Progress">In Progress</option><option value="Blocked">Blocked</option><option value="Done">Done</option></select></div>
+            </div>
+            <button type="submit" class="btn btn-accent w-full justify-center"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span id="modalSubmitText">Add Item</span></button>
+        </form>
+    </div></div>
+</div>
+<script>
+const SUPABASE_URL='https://hqfszlxdkvwlvpwqqmbd.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhxZnN6bHhka3Z3bHZwd3FxbWJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1NTExODgsImV4cCI6MjA4ODEyNzE4OH0.4OlPny5uJFTslf6iWfF7fAaVl0x2I_VG63QPa1Amq8Q';
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const OWNERS=['Don','Mark','Kerushan','Daryl','Tunya','Tim','John','Greg','Verona'];
+const OWNER_COLORS={Don:'#f97316',Mark:'#3b82f6',Kerushan:'#10b981',Daryl:'#8b5cf6',Tunya:'#ec4899',Tim:'#06b6d4',John:'#f43f5e',Greg:'#84cc16',Verona:'#a855f7'};
+let currentUser=null,items=[],currentPage='board',currentOwnerFilter='all',draggedId=null,dropTargetId=null;
+
+async function handleLogin(e){
+    e.preventDefault();
+    const user=document.getElementById('loginUser').value.trim().toLowerCase();
+    const pass=document.getElementById('loginPass').value;
+    const errEl=document.getElementById('loginError');
+    errEl.classList.add('hidden');
+    const{data,error}=await sb.from('cx_standup_users').select('*').eq('username',user).eq('password',pass).single();
+    if(error||!data){errEl.textContent='Invalid username or password';errEl.classList.remove('hidden');return;}
+    currentUser=data;sessionStorage.setItem('cx_user',JSON.stringify(data));showApp();
+}
+function handleLogout(){sessionStorage.removeItem('cx_user');currentUser=null;document.getElementById('mainApp').classList.add('hidden');document.getElementById('loginScreen').classList.remove('hidden');}
+function showApp(){
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('mainApp').classList.remove('hidden');
+    document.getElementById('userAvatar').style.background=currentUser.color;
+    document.getElementById('userAvatar').textContent=currentUser.display_name[0];
+    document.getElementById('userName').textContent=currentUser.display_name;
+    loadItems();
+}
+function checkSession(){const s=sessionStorage.getItem('cx_user');if(s){currentUser=JSON.parse(s);showApp();}}
+
+async function loadItems(){
+    const{data,error}=await sb.from('cx_standup_items').select('*').order('sort_order',{ascending:true});
+    if(error){console.error('Load error:',error);return;}
+    items=(data||[]).map(r=>({id:r.id,item:r.item,action:r.action,priority:r.priority,owner:r.owner,status:r.status,sortOrder:r.sort_order||0,createdAt:r.created_at}));
+    renderAll();
+}
+async function upsertItem(item){
+    const row={id:item.id,item:item.item,action:item.action,priority:item.priority,owner:item.owner,status:item.status,sort_order:item.sortOrder||0,updated_at:new Date().toISOString()};
+    const{error}=await sb.from('cx_standup_items').upsert(row);
+    if(error)console.error('Upsert error:',error);
+}
+async function removeItem(id){const{error}=await sb.from('cx_standup_items').delete().eq('id',id);if(error)console.error('Delete error:',error);}
+
+function getFiltered(){
+    let f=[...items];
+    if(currentOwnerFilter!=='all')f=f.filter(i=>i.owner===currentOwnerFilter);
+    return f;
+}
+function subscribeRealtime(){
+    sb.channel('cx_standup_changes').on('postgres_changes',{event:'*',schema:'public',table:'cx_standup_items'},()=>{loadItems();}).subscribe();
+}
+
+function statusBadge(s){const m={Open:'badge-gray','In Progress':'badge-amber',Blocked:'badge-red',Done:'badge-green'};return '<span class="badge '+m[s]+'">'+s+'</span>';}
+function priorityBadge(p){const m={High:'badge-red',Medium:'badge-amber',Low:'badge-blue'};const i={High:'🔴',Medium:'🟡',Low:'🔵'};return '<span class="badge '+m[p]+'">'+i[p]+' '+p+'</span>';}
+function ownerBadge(o){const c=OWNER_COLORS[o]||'#6b7280';return '<span class="badge" style="background:'+c+'15;color:'+c+'">'+o+'</span>';}
+
+function openAddModal(priority){
+    document.getElementById('f_id').value='';
+    document.getElementById('f_item').value='';
+    document.getElementById('f_action').value='';
+    document.getElementById('f_priority').value=priority||'High';
+    document.getElementById('f_owner').value=currentUser?currentUser.display_name:'Don';
+    document.getElementById('f_status').value='Open';
+    document.getElementById('modalTitle').textContent='Add New Item';
+    document.getElementById('modalSubmitText').textContent='Add Item';
+    document.getElementById('modal').classList.remove('hidden');
+    document.getElementById('f_item').focus();
+}
+function openEditModal(id){
+    const item=items.find(i=>i.id===id);if(!item)return;
+    document.getElementById('f_id').value=item.id;
+    document.getElementById('f_item').value=item.item;
+    document.getElementById('f_action').value=item.action;
+    document.getElementById('f_priority').value=item.priority;
+    document.getElementById('f_owner').value=item.owner;
+    document.getElementById('f_status').value=item.status;
+    document.getElementById('modalTitle').textContent='Edit Item';
+    document.getElementById('modalSubmitText').textContent='Save Changes';
+    document.getElementById('modal').classList.remove('hidden');
+    document.getElementById('f_item').focus();
+}
+function closeModal(){document.getElementById('modal').classList.add('hidden');}
+
+async function saveItem(e){
+    e.preventDefault();
+    const id=document.getElementById('f_id').value;
+    const data={item:document.getElementById('f_item').value.trim(),action:document.getElementById('f_action').value.trim(),priority:document.getElementById('f_priority').value,owner:document.getElementById('f_owner').value,status:document.getElementById('f_status').value};
+    if(id){const existing=items.find(i=>i.id===id);await upsertItem({...existing,...data});}
+    else{await upsertItem({id:Date.now().toString(),...data,sortOrder:0,createdAt:new Date().toISOString()});}
+    closeModal();await loadItems();
+}
+async function deleteItem(id){if(!confirm('Delete this item?'))return;await removeItem(id);await loadItems();}
+
+function handleDragStart(e,id){draggedId=id;e.target.classList.add('dragging');e.dataTransfer.effectAllowed='move';}
+function handleDragEnd(e){e.target.classList.remove('dragging');document.querySelectorAll('.lane-body').forEach(b=>b.classList.remove('drag-over'));document.querySelectorAll('.drop-before').forEach(el=>el.classList.remove('drop-before'));document.querySelectorAll('.drop-after').forEach(el=>el.classList.remove('drop-after'));dropTargetId=null;}
+function handleDragOver(e){e.preventDefault();e.dataTransfer.dropEffect='move';const body=e.currentTarget.querySelector('.lane-body')||e.currentTarget;if(body.classList.contains('lane-body'))body.classList.add('drag-over');}
+function handleDragLeave(e){const body=e.currentTarget.querySelector('.lane-body')||e.currentTarget;if(body.classList.contains('lane-body'))body.classList.remove('drag-over');}
+function handleCardDragOver(e,id){e.preventDefault();e.stopPropagation();e.dataTransfer.dropEffect='move';document.querySelectorAll('.drop-before').forEach(el=>el.classList.remove('drop-before'));document.querySelectorAll('.drop-after').forEach(el=>el.classList.remove('drop-after'));const card=e.currentTarget;const rect=card.getBoundingClientRect();const midY=rect.top+rect.height/2;if(e.clientY<midY){card.classList.add('drop-before');dropTargetId=id;}else{card.classList.add('drop-after');dropTargetId=id+':after';}}
+function handleCardDragLeave(e){e.currentTarget.classList.remove('drop-before','drop-after');}
+
+async function handleDrop(e,priority){
+    e.preventDefault();
+    document.querySelectorAll('.lane-body').forEach(b=>b.classList.remove('drag-over'));
+    document.querySelectorAll('.drop-before').forEach(el=>el.classList.remove('drop-before'));
+    document.querySelectorAll('.drop-after').forEach(el=>el.classList.remove('drop-after'));
+    if(!draggedId)return;
+    const dragIdx=items.findIndex(i=>i.id===draggedId);if(dragIdx<0)return;
+    const[draggedItem]=items.splice(dragIdx,1);draggedItem.priority=priority;
+    if(dropTargetId){
+        const isAfter=dropTargetId.endsWith(':after');const targetId=isAfter?dropTargetId.replace(':after',''):dropTargetId;
+        const targetIdx=items.findIndex(i=>i.id===targetId);
+        if(targetIdx>=0)items.splice(isAfter?targetIdx+1:targetIdx,0,draggedItem);else items.push(draggedItem);
+    }else{let lastIdx=-1;for(let i=items.length-1;i>=0;i--){if(items[i].priority===priority){lastIdx=i;break;}}items.splice(lastIdx>=0?lastIdx+1:items.length,0,draggedItem);}
+    for(let i=0;i<items.length;i++)items[i].sortOrder=i;
+    await Promise.all(items.map(item=>upsertItem(item)));
+    draggedId=null;dropTargetId=null;renderAll();
+}
+
+function renderCard(item){
+    return '<div class="drag-card" draggable="true" ondragstart="handleDragStart(event,\''+item.id+'\')" ondragend="handleDragEnd(event)" ondragover="handleCardDragOver(event,\''+item.id+'\')" ondragleave="handleCardDragLeave(event)">'
+        +'<div class="flex items-start justify-between gap-2 mb-1">'
+        +'<div class="card-title flex-1 cursor-pointer" onclick="openEditModal(\''+item.id+'\')">'+item.item+'</div>'
+        +'<div class="flex items-center gap-1 flex-shrink-0">'
+        +'<button class="text-gray-400 hover:text-blue-600 p-1 rounded hover:bg-blue-50 transition-colors" onclick="openEditModal(\''+item.id+'\')" title="Edit"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>'
+        +'<button class="text-gray-400 hover:text-red-600 p-1 rounded hover:bg-red-50 transition-colors" onclick="deleteItem(\''+item.id+'\')" title="Delete"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>'
+        +'</div></div>'
+        +'<div class="card-action">'+item.action+'</div>'
+        +'<div class="card-meta">'+statusBadge(item.status)+ownerBadge(item.owner)+'</div>'
+        +'</div>';
+}
+
+function renderBoard(){
+    const filtered=getFiltered();
+    ['High','Medium','Low'].forEach(p=>{
+        const laneItems=filtered.filter(i=>i.priority===p);
+        document.getElementById('body-'+p).innerHTML=laneItems.length?laneItems.map(renderCard).join(''):'<div class="text-center text-xs text-gray-400 py-8">Drag items here or click Add Item</div>';
+        document.getElementById('count-'+p).textContent=laneItems.length;
+    });
+}
+
+function renderSummaryCards(){
+    const high=items.filter(i=>i.priority==='High'),med=items.filter(i=>i.priority==='Medium'),low=items.filter(i=>i.priority==='Low');
+    const open=items.filter(i=>i.status==='Open').length,prog=items.filter(i=>i.status==='In Progress').length;
+    document.getElementById('summaryCards').innerHTML=
+        '<div class="stat-card text-center" style="border-left:4px solid #6366f1"><p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Items</p><p class="text-2xl font-bold text-indigo-600 mt-1">'+items.length+'</p><p class="text-xs text-gray-400 mt-1">'+open+' open · '+prog+' in progress</p></div>'
+        +'<div class="stat-card text-center" style="border-left:4px solid #ef4444"><p class="text-xs font-medium text-gray-500 uppercase tracking-wide">🔴 High</p><p class="text-2xl font-bold text-red-600 mt-1">'+high.length+'</p><p class="text-xs text-gray-400 mt-1">This Week</p></div>'
+        +'<div class="stat-card text-center" style="border-left:4px solid #f59e0b"><p class="text-xs font-medium text-gray-500 uppercase tracking-wide">🟡 Medium</p><p class="text-2xl font-bold text-amber-600 mt-1">'+med.length+'</p><p class="text-xs text-gray-400 mt-1">Next 2 Weeks</p></div>'
+        +'<div class="stat-card text-center" style="border-left:4px solid #3b82f6"><p class="text-xs font-medium text-gray-500 uppercase tracking-wide">🔵 Low</p><p class="text-2xl font-bold text-blue-600 mt-1">'+low.length+'</p><p class="text-xs text-gray-400 mt-1">This Month</p></div>';
+}
+
+function renderList(){
+    let filtered=getFiltered();
+    const sf=document.getElementById('listStatusFilter').value,pf=document.getElementById('listPriorityFilter').value,of2=document.getElementById('listOwnerFilter').value;
+    if(sf!=='all')filtered=filtered.filter(i=>i.status===sf);
+    if(pf!=='all')filtered=filtered.filter(i=>i.priority===pf);
+    if(of2!=='all')filtered=filtered.filter(i=>i.owner===of2);
+    if(!filtered.length){document.getElementById('listContainer').innerHTML='<div class="card p-12 text-center text-gray-400 text-sm">No items match your filters.</div>';return;}
+    let html='<div class="space-y-3">';
+    filtered.forEach(item=>{
+        html+='<div class="card p-5"><div class="flex items-start justify-between gap-4 mb-3"><div class="flex-1 cursor-pointer" onclick="openEditModal(\''+item.id+'\')">'
+            +'<div class="text-sm font-semibold text-gray-900">'+item.item+'</div>'
+            +'<div class="text-xs text-gray-500 mt-1 leading-relaxed">'+item.action+'</div></div>'
+            +'<button class="btn-danger" onclick="deleteItem(\''+item.id+'\')"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div>'
+            +'<div class="flex flex-wrap gap-2 items-center">'+priorityBadge(item.priority)+statusBadge(item.status)+ownerBadge(item.owner)+'</div></div>';
+    });
+    html+='</div>';
+    document.getElementById('listContainer').innerHTML=html;
+}
+
+function renderSummary(){
+    const priorities=['High','Medium','Low'];
+    const priColor={High:'red',Medium:'amber',Low:'blue'};
+    let html='<div class="grid grid-cols-3 gap-6 mb-6">';
+    priorities.forEach(p=>{
+        const pi=items.filter(i=>i.priority===p);
+        html+='<div class="card overflow-hidden"><div class="card-header" style="background:'+(p==='High'?'#fef2f2':p==='Medium'?'#fffbeb':'#eff6ff')+'"><div class="flex items-center justify-between"><span class="text-sm font-bold text-gray-800">'+p+' Priority</span><span class="badge badge-'+priColor[p]+'">'+pi.length+'</span></div></div><div class="p-3 space-y-2">';
+        if(!pi.length)html+='<p class="text-xs text-gray-400 text-center py-4">No items</p>';
+        else pi.forEach(i=>{html+='<div class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50"><span class="text-xs text-gray-700 flex-1">'+i.item+'</span>'+ownerBadge(i.owner)+'</div>';});
+        html+='</div></div>';
+    });
+    html+='</div>';
+    html+='<div class="grid grid-cols-3 gap-6 mb-6">';
+    OWNERS.forEach(o=>{
+        const oi=items.filter(i=>i.owner===o);
+        if(!oi.length)return;
+        const c=OWNER_COLORS[o];
+        html+='<div class="card overflow-hidden"><div class="card-header"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full inline-block" style="background:'+c+'"></span><span class="text-sm font-semibold text-gray-800">'+o+'</span></div><span class="badge badge-gray">'+oi.length+'</span></div></div><div class="p-3 space-y-2">';
+        oi.forEach(i=>{html+='<div class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50"><span class="text-xs text-gray-700 flex-1">'+i.item+'</span>'+priorityBadge(i.priority)+'</div>';});
+        html+='</div></div>';
+    });
+    html+='</div>';
+    html+='<div class="card"><div class="card-header"><span class="text-xs font-semibold uppercase tracking-wider text-gray-500">By Status</span></div><div class="p-4"><div class="grid grid-cols-4 gap-4">';
+    ['Open','In Progress','Blocked','Done'].forEach(s=>{html+='<div class="text-center p-4 rounded-lg bg-gray-50"><p class="text-2xl font-bold text-gray-900">'+items.filter(i=>i.status===s).length+'</p><p class="text-xs text-gray-500 mt-1">'+s+'</p></div>';});
+    html+='</div></div></div>';
+    document.getElementById('summaryContent').innerHTML=html;
+}
+
+function showPage(page){
+    currentPage=page;
+    document.querySelectorAll('[id^="page-"]').forEach(p=>p.classList.add('hidden'));
+    document.getElementById('page-'+page).classList.remove('hidden');
+    ['board','list','summary'].forEach(n=>document.getElementById('nav-'+n).classList.remove('active'));
+    document.getElementById('nav-'+page).classList.add('active');
+    renderAll();
+}
+function setOwnerFilter(owner){
+    currentOwnerFilter=owner;
+    document.querySelectorAll('.nav-item').forEach(n=>{if(n.id.startsWith('nav-')&&!['nav-board','nav-list','nav-summary'].includes(n.id))n.classList.remove('active');});
+    document.getElementById('nav-'+(owner==='all'?'all':owner)).classList.add('active');
+    renderAll();
+}
+function renderAll(){renderSummaryCards();if(currentPage==='board')renderBoard();if(currentPage==='list')renderList();if(currentPage==='summary')renderSummary();}
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();if(e.key==='n'&&!e.ctrlKey&&!e.metaKey&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName))openAddModal();});
+subscribeRealtime();checkSession();
+</script>
+</body></html>
