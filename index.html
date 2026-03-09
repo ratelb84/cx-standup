@@ -23,6 +23,19 @@
         <button type="button" class="btn btn-accent w-full justify-center" onclick="saveProject()"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span id="projSubmitText">Add Project</span></button>
     </div></div>
 </div>
+<!-- USER ADMIN MODAL -->
+<div id="userModal" class="fixed inset-0 z-50 hidden" onclick="if(event.target===this)closeUserModal()">
+    <div class="absolute inset-0 bg-black/30"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm"><div class="card p-6">
+        <div class="flex items-center justify-between mb-4"><h3 class="text-base font-semibold text-gray-900" id="userModalTitle">Add User</h3><button class="btn-danger" onclick="closeUserModal()"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div>
+        <input type="hidden" id="u_editing">
+        <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Display Name *</label><input type="text" id="u_name" class="input-field w-full" placeholder="e.g. Sarah"></div>
+        <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Username *</label><input type="text" id="u_username" class="input-field w-full" placeholder="e.g. sarah (lowercase)"></div>
+        <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Password *</label><input type="text" id="u_password" class="input-field w-full" placeholder="e.g. Sarah123!"></div>
+        <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Color</label><input type="color" id="u_color" class="input-field w-full" value="#6366f1" style="height:38px;padding:4px"></div>
+        <button type="button" class="btn btn-accent w-full justify-center" onclick="saveUser()"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span id="userSubmitText">Add User</span></button>
+    </div></div>
+</div>
 <!-- RISK MODAL -->
 <div id="riskModal" class="fixed inset-0 z-50 hidden" onclick="if(event.target===this)closeRiskModal()">
     <div class="absolute inset-0 bg-black/30"></div>
@@ -152,6 +165,10 @@
             <div onclick="setOwnerFilter('Verona')" class="nav-item" id="nav-Verona"><span class="inline-block w-2.5 h-2.5 rounded-full ml-0.5 mr-1" style="background:#a855f7"></span>Verona</div>
             <div onclick="setOwnerFilter('Rich')" class="nav-item" id="nav-Rich"><span class="inline-block w-2.5 h-2.5 rounded-full ml-0.5 mr-1" style="background:#0ea5e9"></span>Rich</div>
         </div>
+        <div id="adminNavSection" class="hidden">
+            <div class="nav-section">🔒 Admin</div>
+            <div onclick="showPage('admin')" class="nav-item" id="nav-admin"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75"/></svg>User Management</div>
+        </div>
         <div class="px-4 py-3 border-t border-white/10"><div class="flex items-center justify-between"><p class="text-[10px] text-gray-500">CX Standup v3.0</p><button onclick="handleLogout()" class="text-[10px] text-gray-500 hover:text-red-400 cursor-pointer">Logout</button></div></div>
     </nav>
     <main class="flex-1 overflow-y-auto scroll-area">
@@ -205,6 +222,12 @@
             <div class="flex items-center justify-between mb-6"><div><h1 class="text-2xl font-bold text-gray-900">Risk Register</h1><p class="text-sm text-gray-500 mt-1">Identify, assess, and track operational risks</p></div><button class="btn btn-accent text-xs" onclick="openRiskModal()"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Add Risk</button></div>
             <div class="grid grid-cols-4 gap-4 mb-6" id="riskStats"></div>
             <div id="risksList"></div>
+        </div>
+        <!-- ADMIN -->
+        <div id="page-admin" class="p-8 hidden">
+            <div class="mb-6"><h1 class="text-2xl font-bold text-gray-900">User Management</h1><p class="text-sm text-gray-500 mt-1">Add, edit, disable, or remove users</p></div>
+            <div class="flex items-center justify-between mb-6"><div class="flex gap-3" id="adminStats"></div><button class="btn btn-accent text-xs" onclick="openUserModal()"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Add User</button></div>
+            <div id="adminUsersList"></div>
         </div>
     </main>
 </div></div>
@@ -268,6 +291,19 @@
         <button type="button" class="btn btn-accent w-full justify-center" onclick="saveProject()"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span id="projSubmitText">Add Project</span></button>
     </div></div>
 </div>
+<!-- USER ADMIN MODAL -->
+<div id="userModal" class="fixed inset-0 z-50 hidden" onclick="if(event.target===this)closeUserModal()">
+    <div class="absolute inset-0 bg-black/30"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm"><div class="card p-6">
+        <div class="flex items-center justify-between mb-4"><h3 class="text-base font-semibold text-gray-900" id="userModalTitle">Add User</h3><button class="btn-danger" onclick="closeUserModal()"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div>
+        <input type="hidden" id="u_editing">
+        <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Display Name *</label><input type="text" id="u_name" class="input-field w-full" placeholder="e.g. Sarah"></div>
+        <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Username *</label><input type="text" id="u_username" class="input-field w-full" placeholder="e.g. sarah (lowercase)"></div>
+        <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Password *</label><input type="text" id="u_password" class="input-field w-full" placeholder="e.g. Sarah123!"></div>
+        <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Color</label><input type="color" id="u_color" class="input-field w-full" value="#6366f1" style="height:38px;padding:4px"></div>
+        <button type="button" class="btn btn-accent w-full justify-center" onclick="saveUser()"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span id="userSubmitText">Add User</span></button>
+    </div></div>
+</div>
 <!-- RISK MODAL -->
 <div id="riskModal" class="fixed inset-0 z-50 hidden" onclick="if(event.target===this)closeRiskModal()">
     <div class="absolute inset-0 bg-black/30"></div>
@@ -289,7 +325,7 @@ const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSI
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const OWNERS=['Don','Mark','Kerushan','Daryl','Tunya','Tim','John','Greg','Verona','Rich'];
 const OWNER_COLORS={Don:'#f97316',Mark:'#3b82f6',Kerushan:'#10b981',Daryl:'#8b5cf6',Tunya:'#ec4899',Tim:'#06b6d4',John:'#f43f5e',Greg:'#84cc16',Verona:'#a855f7',Rich:'#0ea5e9'};
-let currentUser=null,items=[],feedbacks=[],projects=[],risks=[],currentPage='feedback',currentOwnerFilter='all',draggedId=null,dropTargetId=null,selectedOwners=[],projSelectedOwners=[],riskSelectedOwners=[];
+let currentUser=null,items=[],feedbacks=[],projects=[],risks=[],allUsers=[],currentPage='feedback',currentOwnerFilter='all',draggedId=null,dropTargetId=null,selectedOwners=[],projSelectedOwners=[],riskSelectedOwners=[];
 let historyWeekOffset=0;
 
 function getMonday(d){const dt=new Date(d);const day=dt.getDay();const diff=dt.getDate()-day+(day===0?-6:1);dt.setDate(diff);dt.setHours(0,0,0,0);return dt;}
@@ -297,9 +333,9 @@ function formatWeek(d){const mon=getMonday(d);const sun=new Date(mon);sun.setDat
 function getWeekStart(offset){const d=new Date();d.setDate(d.getDate()+(offset||0)*7);return getMonday(d).toISOString().split('T')[0];}
 
 // AUTH
-async function handleLogin(e){e.preventDefault();const user=document.getElementById('loginUser').value.trim().toLowerCase();const pass=document.getElementById('loginPass').value;const errEl=document.getElementById('loginError');errEl.classList.add('hidden');const{data,error}=await sb.from('cx_standup_users').select('*').eq('username',user).eq('password',pass).single();if(error||!data){errEl.textContent='Invalid username or password';errEl.classList.remove('hidden');return;}currentUser=data;sessionStorage.setItem('cx_user',JSON.stringify(data));showApp();}
+async function handleLogin(e){e.preventDefault();const user=document.getElementById('loginUser').value.trim().toLowerCase();const pass=document.getElementById('loginPass').value;const errEl=document.getElementById('loginError');errEl.classList.add('hidden');const{data,error}=await sb.from('cx_standup_users').select('*').eq('username',user).eq('password',pass).single();if(error||!data){errEl.textContent='Invalid username or password';errEl.classList.remove('hidden');return;}if(data.enabled===false){errEl.textContent='Your account has been disabled. Contact your admin.';errEl.classList.remove('hidden');return;}currentUser=data;sessionStorage.setItem('cx_user',JSON.stringify(data));showApp();}
 function handleLogout(){sessionStorage.removeItem('cx_user');currentUser=null;document.getElementById('mainApp').classList.add('hidden');document.getElementById('loginScreen').classList.remove('hidden');}
-function showApp(){document.getElementById('loginScreen').classList.add('hidden');document.getElementById('mainApp').classList.remove('hidden');document.getElementById('userAvatar').style.background=currentUser.color;document.getElementById('userAvatar').textContent=currentUser.display_name[0];document.getElementById('userName').textContent=currentUser.display_name;renderOwnerChips();loadItems();loadFeedback();loadProjects();loadRisks();}
+function showApp(){document.getElementById('loginScreen').classList.add('hidden');document.getElementById('mainApp').classList.remove('hidden');document.getElementById('userAvatar').style.background=currentUser.color;document.getElementById('userAvatar').textContent=currentUser.display_name[0];document.getElementById('userName').textContent=currentUser.display_name;renderOwnerChips();loadItems();loadFeedback();loadProjects();loadRisks();if(currentUser.is_admin){document.getElementById('adminNavSection').classList.remove('hidden');loadAllUsers();}else{document.getElementById('adminNavSection').classList.add('hidden');}}
 function checkSession(){const s=sessionStorage.getItem('cx_user');if(s){currentUser=JSON.parse(s);showApp();}}
 
 // OWNER CHIPS
@@ -352,6 +388,43 @@ function closeRiskModal(){document.getElementById('riskModal').classList.add('hi
 async function saveRisk(){const item=document.getElementById('r_item').value.trim();if(!item){alert('Please enter a risk item');return;}if(riskSelectedOwners.length===0){alert('Please select at least one owner');return;}const id=document.getElementById('r_id').value||Date.now().toString();const existing=risks.find(x=>x.id===id);const row={id:id,item:item,description:document.getElementById('r_description').value,owner:riskSelectedOwners[0],owners:riskSelectedOwners,risk_level:document.getElementById('r_risk').value,impact:document.getElementById('r_impact').value,status:document.getElementById('r_status').value,comments:existing?existing.comments:[],updated_at:new Date().toISOString()};await sb.from('cx_risk_register').upsert(row);closeRiskModal();loadRisks();}
 async function deleteRisk(id){if(!confirm('Delete this risk?'))return;await sb.from('cx_risk_register').delete().eq('id',id);loadRisks();}
 function addRiskComment(){const input=document.getElementById('r_newComment');const text=input.value.trim();if(!text)return;const id=document.getElementById('r_id').value;if(!id)return;const r=risks.find(x=>x.id===id);if(!r)return;if(!r.comments)r.comments=[];r.comments.push({text:text,author:currentUser?currentUser.display_name:'Unknown',date:new Date().toISOString()});renderGenericComments('riskCommentsList',r.comments);input.value='';sb.from('cx_risk_register').update({comments:r.comments,updated_at:new Date().toISOString()}).eq('id',id).then(()=>{});}
+
+
+// ==================== ADMIN ====================
+async function loadAllUsers(){
+    const{data}=await sb.from('cx_standup_users').select('*').order('display_name');
+    allUsers=data||[];
+    if(currentPage==='admin')renderAdminUsers();
+}
+function renderAdminUsers(){
+    const active=allUsers.filter(u=>u.enabled!==false).length;
+    const disabled=allUsers.filter(u=>u.enabled===false).length;
+    document.getElementById('adminStats').innerHTML='<div class="stat-card" style="border-left:4px solid #10b981;padding:10px 16px"><span class="text-xs text-gray-500">Active</span><span class="text-lg font-bold text-green-600 ml-2">'+active+'</span></div><div class="stat-card" style="border-left:4px solid #ef4444;padding:10px 16px"><span class="text-xs text-gray-500">Disabled</span><span class="text-lg font-bold text-red-600 ml-2">'+disabled+'</span></div><div class="stat-card" style="border-left:4px solid #6366f1;padding:10px 16px"><span class="text-xs text-gray-500">Total</span><span class="text-lg font-bold text-indigo-600 ml-2">'+allUsers.length+'</span></div>';
+    let h='<div class="space-y-2">';
+    allUsers.forEach(u=>{
+        const isDisabled=u.enabled===false;
+        const isAdmin=u.is_admin===true;
+        h+='<div class="card p-4'+(isDisabled?' opacity-50':'')+'" style="border-left:4px solid '+(u.color||'#6b7280')+'">';
+        h+='<div class="flex items-center justify-between"><div class="flex items-center gap-3">';
+        h+='<div class="h-8 w-8 rounded-full flex items-center justify-center text-white text-xs font-semibold" style="background:'+(u.color||'#6b7280')+'">'+u.display_name[0]+'</div>';
+        h+='<div><div class="text-sm font-semibold text-gray-900">'+u.display_name+(isAdmin?' <span class="badge badge-purple text-[9px]">Admin</span>':'')+(isDisabled?' <span class="badge badge-red text-[9px]">Disabled</span>':'')+'</div>';
+        h+='<div class="text-xs text-gray-500">@'+u.username+' · '+u.password+'</div></div></div>';
+        h+='<div class="flex items-center gap-2">';
+        h+='<button class="btn text-xs" style="background:#f3f4f6;color:#374151;padding:5px 10px" onclick="openEditUser(''+u.username+'')">Edit</button>';
+        if(!isDisabled)h+='<button class="btn text-xs" style="background:#fef2f2;color:#dc2626;padding:5px 10px" onclick="toggleUserEnabled(''+u.username+'',false)">Disable</button>';
+        else h+='<button class="btn text-xs" style="background:#ecfdf5;color:#059669;padding:5px 10px" onclick="toggleUserEnabled(''+u.username+'',true)">Enable</button>';
+        if(!isAdmin)h+='<button class="btn-danger text-xs" onclick="deleteUser(''+u.username+'')"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>';
+        h+='</div></div></div>';
+    });
+    h+='</div>';
+    document.getElementById('adminUsersList').innerHTML=h;
+}
+function openUserModal(){document.getElementById('u_editing').value='';document.getElementById('u_name').value='';document.getElementById('u_username').value='';document.getElementById('u_username').disabled=false;document.getElementById('u_password').value='';document.getElementById('u_color').value='#6366f1';document.getElementById('userModalTitle').textContent='Add User';document.getElementById('userSubmitText').textContent='Add User';document.getElementById('userModal').classList.remove('hidden');document.getElementById('u_name').focus();}
+function openEditUser(username){const u=allUsers.find(x=>x.username===username);if(!u)return;document.getElementById('u_editing').value=username;document.getElementById('u_name').value=u.display_name;document.getElementById('u_username').value=u.username;document.getElementById('u_username').disabled=true;document.getElementById('u_password').value=u.password;document.getElementById('u_color').value=u.color||'#6366f1';document.getElementById('userModalTitle').textContent='Edit User';document.getElementById('userSubmitText').textContent='Save Changes';document.getElementById('userModal').classList.remove('hidden');}
+function closeUserModal(){document.getElementById('userModal').classList.add('hidden');}
+async function saveUser(){const editing=document.getElementById('u_editing').value;const name=document.getElementById('u_name').value.trim();const username=document.getElementById('u_username').value.trim().toLowerCase();const password=document.getElementById('u_password').value;const color=document.getElementById('u_color').value;if(!name||!username||!password){alert('Please fill in all fields');return;}if(editing){await sb.from('cx_standup_users').update({display_name:name,password:password,color:color}).eq('username',editing);}else{const{error}=await sb.from('cx_standup_users').insert({username:username,display_name:name,password:password,color:color,enabled:true,is_admin:false});if(error){alert('Error: '+error.message);return;}}closeUserModal();loadAllUsers();}
+async function toggleUserEnabled(username,enabled){await sb.from('cx_standup_users').update({enabled:enabled}).eq('username',username);loadAllUsers();}
+async function deleteUser(username){const u=allUsers.find(x=>x.username===username);if(!u)return;if(u.is_admin){alert('Cannot delete admin user');return;}const name=u.display_name;const{data:items1}=await sb.from('cx_standup_items').select('id').contains('owners',[name]).limit(1);if(items1&&items1.length){alert(name+' has action items assigned. Remove or reassign them first.');return;}const{data:proj1}=await sb.from('cx_projects').select('id').contains('owners',[name]).limit(1);if(proj1&&proj1.length){alert(name+' has projects assigned. Remove or reassign them first.');return;}const{data:risk1}=await sb.from('cx_risk_register').select('id').contains('owners',[name]).limit(1);if(risk1&&risk1.length){alert(name+' has risks assigned. Remove or reassign them first.');return;}if(!confirm('Delete user '+name+'? This cannot be undone.'))return;await sb.from('cx_standup_users').delete().eq('username',username);loadAllUsers();}
 
 // REALTIME
 function subscribeRealtime(){
@@ -465,7 +538,7 @@ function showPage(page){
     currentPage=page;
     document.querySelectorAll('[id^="page-"]').forEach(p=>p.classList.add('hidden'));
     document.getElementById('page-'+page).classList.remove('hidden');
-    ['feedback','feedback-history','board','list','people','summary','projects','risks'].forEach(n=>{const el=document.getElementById('nav-'+n);if(el)el.classList.remove('active');});
+    ['feedback','feedback-history','board','list','people','summary','projects','risks','admin'].forEach(n=>{const el=document.getElementById('nav-'+n);if(el)el.classList.remove('active');});
     const navEl=document.getElementById('nav-'+page);if(navEl)navEl.classList.add('active');
     const isFb=page==='feedback'||page==='feedback-history';
     const isPR=page==='projects'||page==='risks';
@@ -475,12 +548,13 @@ function showPage(page){
     else if(page==='feedback-history'){renderFeedbackHistory();}
     else if(page==='projects'){loadProjects();}
     else if(page==='risks'){loadRisks();}
+    else if(page==='admin'){if(currentUser&&currentUser.is_admin)loadAllUsers();}
     else{renderAll();}
 }
 function setOwnerFilter(owner){currentOwnerFilter=owner;document.querySelectorAll('.nav-item').forEach(n=>{if(n.id.startsWith('nav-')&&!['nav-feedback','nav-feedback-history','nav-board','nav-list','nav-people','nav-summary'].includes(n.id))n.classList.remove('active');});document.getElementById('nav-'+(owner==='all'?'all':owner)).classList.add('active');renderAll();}
 function renderAll(){renderSummaryCards();if(currentPage==='board')renderBoard();if(currentPage==='list')renderList();if(currentPage==='people')renderPeople();if(currentPage==='summary')renderSummary();}
 
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeFbModal();closeProjModal();closeRiskModal();}if(e.key==='n'&&!e.ctrlKey&&!e.metaKey&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName))openAddModal();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeFbModal();closeProjModal();closeRiskModal();closeUserModal();}if(e.key==='n'&&!e.ctrlKey&&!e.metaKey&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName))openAddModal();});
 subscribeRealtime();checkSession();
 </script>
 </body></html>
