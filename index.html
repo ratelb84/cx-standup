@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
     <!-- PROJECT MODAL -->
 <div id="projModal" class="fixed inset-0 z-50 hidden" onclick="if(event.target===this)closeProjModal()">
     <div class="absolute inset-0 bg-black/30"></div>
@@ -140,8 +141,10 @@
     <nav class="sidebar w-60 flex flex-col flex-shrink-0 min-h-screen">
         <div class="px-4 py-5 border-b border-white/10 flex items-center justify-center"><img src="logo-dark.png" alt="Ignition CX" style="height:28px;filter:brightness(0) invert(1)"></div>
         <div class="flex-1 py-4 space-y-0.5 overflow-y-auto scroll-area">
+            <div class="nav-section">📊 Dashboard</div>
+            <div onclick="showPage('dashboard')" class="nav-item active" id="nav-dashboard"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>Overview</div>
             <div class="nav-section">📋 Weekly Feedback</div>
-            <div onclick="showPage('feedback')" class="nav-item active" id="nav-feedback"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>This Week</div>
+            <div onclick="showPage('feedback')" class="nav-item" id="nav-feedback"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>This Week</div>
             <div onclick="showPage('feedback-history')" class="nav-item" id="nav-feedback-history"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>History</div>
             <div class="nav-section">⚡ Action Items</div>
             <div onclick="showPage('board')" class="nav-item" id="nav-board"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125z"/></svg>Priority Board</div>
@@ -173,6 +176,24 @@
     </nav>
     <main class="flex-1 overflow-y-auto scroll-area">
         <div class="topbar flex items-center justify-between px-8 py-3 sticky top-0 z-10"><h2 class="text-sm font-semibold text-gray-800" id="topBarTitle">CX Standup</h2><div class="flex items-center gap-4"><button class="btn btn-accent text-xs" id="topAddBtn" onclick="openAddModal()"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Add Item</button><div class="h-5 w-px bg-gray-200"></div><div class="flex items-center gap-2"><div id="userAvatar" class="h-7 w-7 rounded-full flex items-center justify-center text-white text-xs font-semibold"></div><span id="userName" class="text-xs font-medium text-gray-700"></span></div></div></div>
+
+        <!-- DASHBOARD -->
+        <div id="page-dashboard" class="p-8 hidden">
+            <div class="mb-6"><h1 class="text-2xl font-bold text-gray-900" id="dashTitle">Dashboard</h1><p class="text-sm text-gray-500 mt-1" id="dashSubtitle">Your overview at a glance</p></div>
+            <div class="grid grid-cols-5 gap-4 mb-6" id="dashStats"></div>
+            <div class="grid grid-cols-2 gap-6 mb-6">
+                <div class="card"><div class="card-header"><span class="text-xs font-semibold uppercase tracking-wider text-gray-500">Items by Priority</span></div><div class="p-5"><canvas id="chartPriority" height="200"></canvas></div></div>
+                <div class="card"><div class="card-header"><span class="text-xs font-semibold uppercase tracking-wider text-gray-500">Items by Status</span></div><div class="p-5"><canvas id="chartStatus" height="200"></canvas></div></div>
+            </div>
+            <div class="grid grid-cols-2 gap-6 mb-6" id="dashAdminCharts">
+                <div class="card"><div class="card-header"><span class="text-xs font-semibold uppercase tracking-wider text-gray-500">Items by Person</span></div><div class="p-5"><canvas id="chartPerson" height="260"></canvas></div></div>
+                <div class="card"><div class="card-header"><span class="text-xs font-semibold uppercase tracking-wider text-gray-500">Projects & Risks</span></div><div class="p-5"><canvas id="chartProjRisk" height="260"></canvas></div></div>
+            </div>
+            <div class="grid grid-cols-2 gap-6">
+                <div class="card"><div class="card-header"><span class="text-xs font-semibold uppercase tracking-wider text-gray-500">⚠️ Overdue Items</span></div><div class="p-4" id="dashOverdue"></div></div>
+                <div class="card"><div class="card-header"><span class="text-xs font-semibold uppercase tracking-wider text-gray-500">🔴 High Priority Items</span></div><div class="p-4" id="dashHighPriority"></div></div>
+            </div>
+        </div>
 
         <!-- FEEDBACK THIS WEEK -->
         <div id="page-feedback" class="p-8 hidden">
@@ -325,7 +346,7 @@ const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSI
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const OWNERS=['Don','Mark','Kerushan','Daryl','Tunya','Tim','John','Greg','Verona','Rich'];
 const OWNER_COLORS={Don:'#f97316',Mark:'#3b82f6',Kerushan:'#10b981',Daryl:'#8b5cf6',Tunya:'#ec4899',Tim:'#06b6d4',John:'#f43f5e',Greg:'#84cc16',Verona:'#a855f7',Rich:'#0ea5e9'};
-let currentUser=null,items=[],feedbacks=[],projects=[],risks=[],allUsers=[],currentPage='feedback',currentOwnerFilter='all',draggedId=null,dropTargetId=null,selectedOwners=[],projSelectedOwners=[],riskSelectedOwners=[];
+let currentUser=null,items=[],feedbacks=[],projects=[],risks=[],allUsers=[],currentPage='dashboard',currentOwnerFilter='all',draggedId=null,dropTargetId=null,selectedOwners=[],projSelectedOwners=[],riskSelectedOwners=[];
 let historyWeekOffset=0;
 
 function getMonday(d){const dt=new Date(d);const day=dt.getDay();const diff=dt.getDate()-day+(day===0?-6:1);dt.setDate(diff);dt.setHours(0,0,0,0);return dt;}
@@ -389,6 +410,64 @@ async function saveRisk(){const item=document.getElementById('r_item').value.tri
 async function deleteRisk(id){if(!confirm('Delete this risk?'))return;await sb.from('cx_risk_register').delete().eq('id',id);loadRisks();}
 function addRiskComment(){const input=document.getElementById('r_newComment');const text=input.value.trim();if(!text)return;const id=document.getElementById('r_id').value;if(!id)return;const r=risks.find(x=>x.id===id);if(!r)return;if(!r.comments)r.comments=[];r.comments.push({text:text,author:currentUser?currentUser.display_name:'Unknown',date:new Date().toISOString()});renderGenericComments('riskCommentsList',r.comments);input.value='';sb.from('cx_risk_register').update({comments:r.comments,updated_at:new Date().toISOString()}).eq('id',id).then(()=>{});}
 
+
+
+// ==================== DASHBOARD ====================
+let chartPriority=null,chartStatus=null,chartPerson=null,chartProjRisk=null;
+function getDashItems(){
+    const isAdmin=currentUser&&currentUser.is_admin;
+    if(isAdmin)return items;
+    const name=currentUser?currentUser.display_name:'';
+    return items.filter(i=>(i.owners||[i.owner]).includes(name));
+}
+function renderDashboard(){
+    const isAdmin=currentUser&&currentUser.is_admin;
+    const di=getDashItems();
+    const name=currentUser?currentUser.display_name:'You';
+    document.getElementById('dashTitle').textContent=isAdmin?'Dashboard — All Teams':name+"'s Dashboard";
+    document.getElementById('dashSubtitle').textContent=isAdmin?'Overview across all team members':'Your items and priorities';
+    document.getElementById('dashAdminCharts').style.display=isAdmin?'grid':'none';
+    // Stats
+    const total=di.length;
+    const open=di.filter(i=>i.status==='Open').length;
+    const inProg=di.filter(i=>i.status==='In Progress').length;
+    const blocked=di.filter(i=>i.status==='Blocked').length;
+    const overdue=di.filter(i=>{if(!i.dueDate||i.status==='Done')return false;const d=new Date(i.dueDate+'T00:00:00');const n=new Date();n.setHours(0,0,0,0);return d<n;}).length;
+    document.getElementById('dashStats').innerHTML='<div class="stat-card text-center" style="border-left:4px solid #6366f1"><p class="text-xs font-medium text-gray-500 uppercase">Total</p><p class="text-2xl font-bold text-indigo-600 mt-1">'+total+'</p></div><div class="stat-card text-center" style="border-left:4px solid #9ca3af"><p class="text-xs font-medium text-gray-500 uppercase">Open</p><p class="text-2xl font-bold text-gray-600 mt-1">'+open+'</p></div><div class="stat-card text-center" style="border-left:4px solid #f59e0b"><p class="text-xs font-medium text-gray-500 uppercase">In Progress</p><p class="text-2xl font-bold text-amber-600 mt-1">'+inProg+'</p></div><div class="stat-card text-center" style="border-left:4px solid #ef4444"><p class="text-xs font-medium text-gray-500 uppercase">Blocked</p><p class="text-2xl font-bold text-red-600 mt-1">'+blocked+'</p></div><div class="stat-card text-center" style="border-left:4px solid #dc2626"><p class="text-xs font-medium text-gray-500 uppercase">Overdue</p><p class="text-2xl font-bold text-red-700 mt-1">'+overdue+'</p></div>';
+    // Priority chart
+    const high=di.filter(i=>i.priority==='High').length;const med=di.filter(i=>i.priority==='Medium').length;const low=di.filter(i=>i.priority==='Low').length;
+    if(chartPriority)chartPriority.destroy();
+    const ctxP=document.getElementById('chartPriority').getContext('2d');
+    chartPriority=new Chart(ctxP,{type:'doughnut',data:{labels:['High','Medium','Low'],datasets:[{data:[high,med,low],backgroundColor:['#ef4444','#f59e0b','#3b82f6'],borderWidth:0}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:11,family:'Poppins'},padding:12}}}}});
+    // Status chart
+    const sOpen=di.filter(i=>i.status==='Open').length;const sIP=di.filter(i=>i.status==='In Progress').length;const sBlk=di.filter(i=>i.status==='Blocked').length;const sDone=di.filter(i=>i.status==='Done').length;
+    if(chartStatus)chartStatus.destroy();
+    const ctxS=document.getElementById('chartStatus').getContext('2d');
+    chartStatus=new Chart(ctxS,{type:'doughnut',data:{labels:['Open','In Progress','Blocked','Done'],datasets:[{data:[sOpen,sIP,sBlk,sDone],backgroundColor:['#9ca3af','#f59e0b','#ef4444','#10b981'],borderWidth:0}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:11,family:'Poppins'},padding:12}}}}});
+    // Admin: person chart
+    if(isAdmin){
+        const personData=OWNERS.map(o=>{return items.filter(i=>(i.owners||[i.owner]).includes(o)&&i.status!=='Done').length;});
+        const personColors=OWNERS.map(o=>OWNER_COLORS[o]);
+        if(chartPerson)chartPerson.destroy();
+        const ctxPe=document.getElementById('chartPerson').getContext('2d');
+        chartPerson=new Chart(ctxPe,{type:'bar',data:{labels:OWNERS,datasets:[{label:'Active Items',data:personData,backgroundColor:personColors,borderRadius:6,borderSkipped:false}]},options:{responsive:true,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:11,family:'Poppins'}}},y:{grid:{display:false},ticks:{font:{size:11,family:'Poppins'}}}}}});
+        // Projects & Risks summary
+        const pActive=projects.filter(p=>p.status==='Active').length;const pHold=projects.filter(p=>p.status==='On Hold').length;const pDone=projects.filter(p=>p.status==='Complete').length;
+        const rHigh=risks.filter(r=>r.riskLevel==='High'&&r.status!=='Closed').length;const rMed=risks.filter(r=>r.riskLevel==='Medium'&&r.status!=='Closed').length;const rLow=risks.filter(r=>r.riskLevel==='Low'&&r.status!=='Closed').length;
+        if(chartProjRisk)chartProjRisk.destroy();
+        const ctxPR=document.getElementById('chartProjRisk').getContext('2d');
+        chartProjRisk=new Chart(ctxPR,{type:'bar',data:{labels:['Projects Active','Projects On Hold','Projects Complete','Risks High','Risks Medium','Risks Low'],datasets:[{data:[pActive,pHold,pDone,rHigh,rMed,rLow],backgroundColor:['#10b981','#f59e0b','#3b82f6','#ef4444','#f59e0b','#3b82f6'],borderRadius:6,borderSkipped:false}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:10,family:'Poppins'}}},y:{grid:{color:'#f3f4f6'},ticks:{font:{size:11,family:'Poppins'},stepSize:1}}}}});
+    }
+    // Overdue items list
+    const now=new Date();now.setHours(0,0,0,0);
+    const overdueItems=di.filter(i=>{if(!i.dueDate||i.status==='Done')return false;return new Date(i.dueDate+'T00:00:00')<now;}).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate));
+    if(!overdueItems.length){document.getElementById('dashOverdue').innerHTML='<p class="text-xs text-gray-400 text-center py-6">No overdue items 🎉</p>';}
+    else{let oh='<div class="space-y-2">';overdueItems.forEach(i=>{const days=Math.ceil((now-new Date(i.dueDate+'T00:00:00'))/(864e5));const ow=(i.owners||[i.owner]).map(o=>ownerBadge(o)).join('');oh+='<div class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-red-50 cursor-pointer" onclick="openEditModal(\''+i.id+'\')"><div class="flex-1 mr-3"><div class="text-xs font-semibold text-gray-900">'+i.item+'</div></div><div class="flex items-center gap-1"><span class="due-badge due-overdue">'+days+'d overdue</span>'+ow+'</div></div>';});oh+='</div>';document.getElementById('dashOverdue').innerHTML=oh;}
+    // High priority items
+    const highItems=di.filter(i=>i.priority==='High'&&i.status!=='Done');
+    if(!highItems.length){document.getElementById('dashHighPriority').innerHTML='<p class="text-xs text-gray-400 text-center py-6">No high priority items</p>';}
+    else{let hh='<div class="space-y-2">';highItems.forEach(i=>{const ow=(i.owners||[i.owner]).map(o=>ownerBadge(o)).join('');const dh=dueBadge(i.dueDate);hh+='<div class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50 cursor-pointer" onclick="openEditModal(\''+i.id+'\')"><div class="flex-1 mr-3"><div class="text-xs font-semibold text-gray-900">'+i.item+'</div></div><div class="flex items-center gap-1">'+statusBadge(i.status)+ow+(dh?' '+dh:'')+'</div></div>';});hh+='</div>';document.getElementById('dashHighPriority').innerHTML=hh;}
+}
 
 // ==================== ADMIN ====================
 async function loadAllUsers(){
@@ -538,13 +617,15 @@ function showPage(page){
     currentPage=page;
     document.querySelectorAll('[id^="page-"]').forEach(p=>p.classList.add('hidden'));
     document.getElementById('page-'+page).classList.remove('hidden');
-    ['feedback','feedback-history','board','list','people','summary','projects','risks','admin'].forEach(n=>{const el=document.getElementById('nav-'+n);if(el)el.classList.remove('active');});
+    ['dashboard','feedback','feedback-history','board','list','people','summary','projects','risks','admin'].forEach(n=>{const el=document.getElementById('nav-'+n);if(el)el.classList.remove('active');});
     const navEl=document.getElementById('nav-'+page);if(navEl)navEl.classList.add('active');
     const isFb=page==='feedback'||page==='feedback-history';
     const isPR=page==='projects'||page==='risks';
-    document.getElementById('topAddBtn').style.display=(isFb||isPR)?'none':'inline-flex';
-    document.getElementById('topBarTitle').textContent=isFb?'Weekly Feedback':isPR?(page==='projects'?'AI / Automation Projects':'Risk Register'):'Action Items';
-    if(page==='feedback'){loadFeedback();}
+    const isDash=page==='dashboard';
+    document.getElementById('topAddBtn').style.display=(isFb||isPR||isDash)?'none':'inline-flex';
+    document.getElementById('topBarTitle').textContent=isDash?'Dashboard':isFb?'Weekly Feedback':isPR?(page==='projects'?'AI / Automation Projects':'Risk Register'):'Action Items';
+    if(page==='dashboard'){renderDashboard();}
+    else if(page==='feedback'){loadFeedback();}
     else if(page==='feedback-history'){renderFeedbackHistory();}
     else if(page==='projects'){loadProjects();}
     else if(page==='risks'){loadRisks();}
