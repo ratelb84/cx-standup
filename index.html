@@ -121,20 +121,20 @@
         <div class="topbar flex items-center justify-between px-8 py-3 sticky top-0 z-10"><h2 class="text-sm font-semibold text-gray-800" id="topBarTitle">CX Standup</h2><div class="flex items-center gap-4"><button class="btn btn-accent text-xs" id="topAddBtn" onclick="openAddModal()"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Add Item</button><div class="h-5 w-px bg-gray-200"></div><div class="flex items-center gap-2"><div id="userAvatar" class="h-7 w-7 rounded-full flex items-center justify-center text-white text-xs font-semibold"></div><span id="userName" class="text-xs font-medium text-gray-700"></span></div><button id="topAdminBtn" class="btn text-xs hidden" style="background:#f3f4f6;color:#374151;padding:5px 12px" onclick="showPage('admin')">⚙️ Admin</button></div></div>
 
         <!-- DASHBOARD -->
-        <div id="page-dashboard" class="p-8 hidden">
-            <div class="mb-6"><h1 class="text-2xl font-bold text-gray-900" id="dashTitle">Dashboard</h1><p class="text-sm text-gray-500 mt-1" id="dashSubtitle">Your overview at a glance</p></div>
-            <div class="grid grid-cols-5 gap-4 mb-6" id="dashStats"></div>
-            <div class="grid grid-cols-2 gap-6 mb-6">
-                <div class="card"><div class="card-header"><span class="text-xs font-semibold uppercase tracking-wider text-gray-500">Items by Priority</span></div><div class="p-5"><canvas id="chartPriority" height="200"></canvas></div></div>
-                <div class="card"><div class="card-header"><span class="text-xs font-semibold uppercase tracking-wider text-gray-500">Items by Status</span></div><div class="p-5"><canvas id="chartStatus" height="200"></canvas></div></div>
+        <div id="page-dashboard" class="p-6 hidden">
+            <div class="mb-4"><h1 class="text-lg font-bold text-gray-900" id="dashTitle">Dashboard</h1><p class="text-xs text-gray-500 mt-0.5" id="dashSubtitle">Your overview at a glance</p></div>
+            <div class="grid grid-cols-5 gap-3 mb-4" id="dashStats"></div>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div class="card"><div class="px-4 py-2 border-b border-gray-100"><span class="text-[10px] font-semibold uppercase tracking-wider text-gray-500">Items by Priority</span></div><div class="p-3"><canvas id="chartPriority" height="160"></canvas></div></div>
+                <div class="card"><div class="px-4 py-2 border-b border-gray-100"><span class="text-[10px] font-semibold uppercase tracking-wider text-gray-500">Items by Status</span></div><div class="p-3"><canvas id="chartStatus" height="160"></canvas></div></div>
             </div>
-            <div class="grid grid-cols-2 gap-6 mb-6" id="dashAdminCharts">
-                <div class="card"><div class="card-header"><span class="text-xs font-semibold uppercase tracking-wider text-gray-500">Items by Person</span></div><div class="p-5"><canvas id="chartPerson" height="260"></canvas></div></div>
-                <div class="card"><div class="card-header"><span class="text-xs font-semibold uppercase tracking-wider text-gray-500">Projects & Risks</span></div><div class="p-5"><canvas id="chartProjRisk" height="260"></canvas></div></div>
+            <div class="grid grid-cols-2 gap-4 mb-4" id="dashAdminCharts">
+                <div class="card"><div class="px-4 py-2 border-b border-gray-100"><span class="text-[10px] font-semibold uppercase tracking-wider text-gray-500">Items by Person</span></div><div class="p-3"><canvas id="chartPerson" height="200"></canvas></div></div>
+                <div class="card"><div class="px-4 py-2 border-b border-gray-100"><span class="text-[10px] font-semibold uppercase tracking-wider text-gray-500">Projects & Risks</span></div><div class="p-3"><canvas id="chartProjRisk" height="200"></canvas></div></div>
             </div>
-            <div class="grid grid-cols-2 gap-6">
-                <div class="card"><div class="card-header"><span class="text-xs font-semibold uppercase tracking-wider text-gray-500">⚠️ Overdue Items</span></div><div class="p-4" id="dashOverdue"></div></div>
-                <div class="card"><div class="card-header"><span class="text-xs font-semibold uppercase tracking-wider text-gray-500">🔴 High Priority Items</span></div><div class="p-4" id="dashHighPriority"></div></div>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="card"><div class="px-4 py-2 border-b border-gray-100"><span class="text-[10px] font-semibold uppercase tracking-wider text-gray-500">⚠️ Overdue Items</span></div><div class="p-3" id="dashOverdue"></div></div>
+                <div class="card"><div class="px-4 py-2 border-b border-gray-100"><span class="text-[10px] font-semibold uppercase tracking-wider text-gray-500">🔴 High Priority Items</span></div><div class="p-3" id="dashHighPriority"></div></div>
             </div>
         </div>
 
@@ -376,17 +376,17 @@ function renderDashboard(){
     const inProg=di.filter(i=>i.status==='In Progress').length;
     const blocked=di.filter(i=>i.status==='Blocked').length;
     const overdue=di.filter(i=>{if(!i.dueDate||i.status==='Done')return false;const d=new Date(i.dueDate+'T00:00:00');const n=new Date();n.setHours(0,0,0,0);return d<n;}).length;
-    document.getElementById('dashStats').innerHTML='<div class="stat-card text-center" style="border-left:4px solid #6366f1"><p class="text-xs font-medium text-gray-500 uppercase">Total</p><p class="text-2xl font-bold text-indigo-600 mt-1">'+total+'</p></div><div class="stat-card text-center" style="border-left:4px solid #9ca3af"><p class="text-xs font-medium text-gray-500 uppercase">Open</p><p class="text-2xl font-bold text-gray-600 mt-1">'+open+'</p></div><div class="stat-card text-center" style="border-left:4px solid #f59e0b"><p class="text-xs font-medium text-gray-500 uppercase">In Progress</p><p class="text-2xl font-bold text-amber-600 mt-1">'+inProg+'</p></div><div class="stat-card text-center" style="border-left:4px solid #ef4444"><p class="text-xs font-medium text-gray-500 uppercase">Blocked</p><p class="text-2xl font-bold text-red-600 mt-1">'+blocked+'</p></div><div class="stat-card text-center" style="border-left:4px solid #dc2626"><p class="text-xs font-medium text-gray-500 uppercase">Overdue</p><p class="text-2xl font-bold text-red-700 mt-1">'+overdue+'</p></div>';
+    document.getElementById('dashStats').innerHTML='<div class="stat-card text-center" style="border-left:3px solid #6366f1;padding:10px 14px"><p class="text-[10px] font-medium text-gray-500 uppercase">Total</p><p class="text-xl font-bold text-indigo-600">'+total+'</p></div><div class="stat-card text-center" style="border-left:3px solid #9ca3af;padding:10px 14px"><p class="text-[10px] font-medium text-gray-500 uppercase">Open</p><p class="text-xl font-bold text-gray-600">'+open+'</p></div><div class="stat-card text-center" style="border-left:3px solid #f59e0b;padding:10px 14px"><p class="text-[10px] font-medium text-gray-500 uppercase">In Progress</p><p class="text-xl font-bold text-amber-600">'+inProg+'</p></div><div class="stat-card text-center" style="border-left:3px solid #ef4444;padding:10px 14px"><p class="text-[10px] font-medium text-gray-500 uppercase">Blocked</p><p class="text-xl font-bold text-red-600">'+blocked+'</p></div><div class="stat-card text-center" style="border-left:3px solid #dc2626;padding:10px 14px"><p class="text-[10px] font-medium text-gray-500 uppercase">Overdue</p><p class="text-xl font-bold text-red-700">'+overdue+'</p></div>';
     // Priority chart
     const high=di.filter(i=>i.priority==='High').length;const med=di.filter(i=>i.priority==='Medium').length;const low=di.filter(i=>i.priority==='Low').length;
     if(chartPriority)chartPriority.destroy();
     const ctxP=document.getElementById('chartPriority').getContext('2d');
-    chartPriority=new Chart(ctxP,{type:'doughnut',data:{labels:['High','Medium','Low'],datasets:[{data:[high,med,low],backgroundColor:['#ef4444','#f59e0b','#3b82f6'],borderWidth:0}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:11,family:'Poppins'},padding:12}}}}});
+    chartPriority=new Chart(ctxP,{type:'doughnut',data:{labels:['High','Medium','Low'],datasets:[{data:[high,med,low],backgroundColor:['#ef4444','#f59e0b','#3b82f6'],borderWidth:0}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:10,family:'Poppins'},padding:8,boxWidth:10}}}}});
     // Status chart
     const sOpen=di.filter(i=>i.status==='Open').length;const sIP=di.filter(i=>i.status==='In Progress').length;const sBlk=di.filter(i=>i.status==='Blocked').length;const sDone=di.filter(i=>i.status==='Done').length;
     if(chartStatus)chartStatus.destroy();
     const ctxS=document.getElementById('chartStatus').getContext('2d');
-    chartStatus=new Chart(ctxS,{type:'doughnut',data:{labels:['Open','In Progress','Blocked','Done'],datasets:[{data:[sOpen,sIP,sBlk,sDone],backgroundColor:['#9ca3af','#f59e0b','#ef4444','#10b981'],borderWidth:0}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:11,family:'Poppins'},padding:12}}}}});
+    chartStatus=new Chart(ctxS,{type:'doughnut',data:{labels:['Open','In Progress','Blocked','Done'],datasets:[{data:[sOpen,sIP,sBlk,sDone],backgroundColor:['#9ca3af','#f59e0b','#ef4444','#10b981'],borderWidth:0}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:10,family:'Poppins'},padding:8,boxWidth:10}}}}});
     // Admin: person chart
     if(isAdmin){
         const personData=OWNERS.map(o=>{return items.filter(i=>(i.owners||[i.owner]).includes(o)&&i.status!=='Done').length;});
@@ -405,11 +405,11 @@ function renderDashboard(){
     const now=new Date();now.setHours(0,0,0,0);
     const overdueItems=di.filter(i=>{if(!i.dueDate||i.status==='Done')return false;return new Date(i.dueDate+'T00:00:00')<now;}).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate));
     if(!overdueItems.length){document.getElementById('dashOverdue').innerHTML='<p class="text-xs text-gray-400 text-center py-6">No overdue items 🎉</p>';}
-    else{let oh='<div class="space-y-2">';overdueItems.forEach(i=>{const days=Math.ceil((now-new Date(i.dueDate+'T00:00:00'))/(864e5));const ow=(i.owners||[i.owner]).map(o=>ownerBadge(o)).join('');oh+='<div class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-red-50 cursor-pointer" onclick="openEditModal(\''+i.id+'\')"><div class="flex-1 mr-3"><div class="text-xs font-semibold text-gray-900">'+i.item+'</div></div><div class="flex items-center gap-1"><span class="due-badge due-overdue">'+days+'d overdue</span>'+ow+'</div></div>';});oh+='</div>';document.getElementById('dashOverdue').innerHTML=oh;}
+    else{let oh='<div class="space-y-1">';overdueItems.forEach(i=>{const days=Math.ceil((now-new Date(i.dueDate+'T00:00:00'))/(864e5));const ow=(i.owners||[i.owner]).map(o=>ownerBadge(o)).join('');oh+='<div class="flex items-center justify-between py-1.5 px-2 rounded hover:bg-red-50 cursor-pointer" onclick="openEditModal(\''+i.id+'\')"><div class="flex-1 mr-2"><div class="text-[11px] font-medium text-gray-900 truncate">'+i.item+'</div></div><div class="flex items-center gap-1 flex-shrink-0"><span class="due-badge due-overdue" style="font-size:9px">'+days+'d</span>'+ow+'</div></div>';});oh+='</div>';document.getElementById('dashOverdue').innerHTML=oh;}
     // High priority items
     const highItems=di.filter(i=>i.priority==='High'&&i.status!=='Done');
     if(!highItems.length){document.getElementById('dashHighPriority').innerHTML='<p class="text-xs text-gray-400 text-center py-6">No high priority items</p>';}
-    else{let hh='<div class="space-y-2">';highItems.forEach(i=>{const ow=(i.owners||[i.owner]).map(o=>ownerBadge(o)).join('');const dh=dueBadge(i.dueDate);hh+='<div class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50 cursor-pointer" onclick="openEditModal(\''+i.id+'\')"><div class="flex-1 mr-3"><div class="text-xs font-semibold text-gray-900">'+i.item+'</div></div><div class="flex items-center gap-1">'+statusBadge(i.status)+ow+(dh?' '+dh:'')+'</div></div>';});hh+='</div>';document.getElementById('dashHighPriority').innerHTML=hh;}
+    else{let hh='<div class="space-y-1">';highItems.forEach(i=>{const ow=(i.owners||[i.owner]).map(o=>ownerBadge(o)).join('');const dh=dueBadge(i.dueDate);hh+='<div class="flex items-center justify-between py-1.5 px-2 rounded hover:bg-gray-50 cursor-pointer" onclick="openEditModal(\''+i.id+'\')"><div class="flex-1 mr-2"><div class="text-[11px] font-medium text-gray-900 truncate">'+i.item+'</div></div><div class="flex items-center gap-1 flex-shrink-0">'+statusBadge(i.status)+ow+(dh?' '+dh:'')+'</div></div>';});hh+='</div>';document.getElementById('dashHighPriority').innerHTML=hh;}
 }
 
 // ==================== ADMIN ====================
