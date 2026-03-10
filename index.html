@@ -520,25 +520,24 @@ function openFbModal(owner,weekStart){
 }
 function closeFbModal(){document.getElementById('fbModal').classList.add('hidden');}
 
-function renderFeedbackSubmissionForm(){
-    const ws=getWeekStart(0);
+let submissionWeekOffset=0;function renderFeedbackSubmissionForm(){
+    const ws=getWeekStart(submissionWeekOffset);
+    const weekDate=new Date(ws+'T00:00:00');
     const fb=feedbacks.find(f=>f.owner===currentUser.display_name&&f.week_start===ws);
     const c=OWNER_COLORS[currentUser.display_name]||'#6b7280';
-    let h='<div class="card p-6" style="border-left:4px solid '+c+'">';
-    h+='<div class="mb-6"><div class="flex items-center justify-between mb-4"><div><h2 class="text-lg font-bold text-gray-900">'+currentUser.display_name+'</h2><p class="text-xs text-gray-500 mt-1">Week of '+formatWeek(new Date(ws+'T00:00:00'))+'</p></div><span class="badge '+(fb?.status==='Submitted'?'badge-green':'badge-amber')+'">'+( fb?.status||'Not Started')+'</span></div></div>';
-    h+='<form onsubmit="saveFeedback(event,\'Submitted\')">';
+    let h='<div class="mb-6 flex items-center justify-between"><div class="flex items-center gap-4"><button class="btn" style="background:#f3f4f6;color:#374151" onclick="submissionWeekOffset++;renderFeedbackSubmissionForm()">← Previous</button><div class="text-center min-w-48"><p class="text-xs text-gray-500 uppercase tracking-wide">Week of</p><p class="text-lg font-bold text-gray-900">'+formatWeek(weekDate)+'</p></div><button class="btn" style="background:#f3f4f6;color:#374151" onclick="submissionWeekOffset--;renderFeedbackSubmissionForm()" '+(submissionWeekOffset<=0?'disabled style="opacity:0.3"':'')+'>Next →</button></div><div class="flex gap-2"><button type="button" class="btn btn-accent text-xs" onclick="saveFeedbackSubmission(\''+ws+'\',{performance:document.getElementById(\'sub_performance\').value,red_flags:document.getElementById(\'sub_red_flags\').value,project_updates:document.getElementById(\'sub_project_updates\').value,key_focus:document.getElementById(\'sub_key_focus\').value},\'Submitted\')"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Submit</button><button type="button" class="btn text-xs" style="background:#f3f4f6;color:#374151" onclick="saveFeedbackDraft(\''+ws+'\')">Edit</button></div></div>';
+    h+='<div class="card p-6" style="border-left:4px solid '+c+'">';
+    h+='<div class="mb-6"><div class="flex items-center justify-between"><div><h2 class="text-lg font-bold text-gray-900">'+currentUser.display_name+'</h2></div><span class="badge '+(fb?.status==='Submitted'?'badge-green':'badge-amber')+'">'+( fb?.status||'Not Started')+'</span></div></div>';
+    h+='<div class="space-y-4">';
     h+='<div class="fb-section"><h4>📊 1. Performance vs Target (Key Metrics Only)</h4><textarea id="sub_performance" class="input-field w-full" rows="4" placeholder="Key metrics, actuals vs targets...">'+( fb?.performance||'')+'</textarea></div>';
     h+='<div class="fb-section"><h4>🚨 2. Red Flags / Issues</h4><textarea id="sub_red_flags" class="input-field w-full" rows="4" placeholder="Issues, risks, things to be aware of...">'+( fb?.red_flags||'')+'</textarea></div>';
     h+='<div class="fb-section"><h4>📌 3. Key Project Updates</h4><textarea id="sub_project_updates" class="input-field w-full" rows="4" placeholder="Project progress, milestones, blockers...">'+( fb?.project_updates||'')+'</textarea></div>';
     h+='<div class="fb-section"><h4>🎯 4. Key Focus Item (This Week)</h4><textarea id="sub_key_focus" class="input-field w-full" rows="3" placeholder="The #1 priority for this week...">'+( fb?.key_focus||'')+'</textarea></div>';
-    h+='<div class="flex gap-3"><button type="submit" class="btn btn-accent flex-1 justify-center"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Submit</button><button type="button" class="btn flex-1 justify-center" style="background:#f3f4f6;color:#374151" onclick="saveFeedbackDraft()">Save Draft</button></div>';
-    h+='</form></div>';
+    h+='</div></div>';
     document.getElementById('feedbackSubmissionForm').innerHTML=h;
 }
 
-function saveFeedbackDraft(){const ws=getWeekStart(0);const data={performance:document.getElementById('sub_performance').value,red_flags:document.getElementById('sub_red_flags').value,project_updates:document.getElementById('sub_project_updates').value,key_focus:document.getElementById('sub_key_focus').value};saveFeedbackSubmission(ws,data,'Draft');}
-
-async function saveFeedback(e,status){e.preventDefault();const ws=getWeekStart(0);const data={performance:document.getElementById('sub_performance').value,red_flags:document.getElementById('sub_red_flags').value,project_updates:document.getElementById('sub_project_updates').value,key_focus:document.getElementById('sub_key_focus').value};await saveFeedbackSubmission(ws,data,status);}
+function saveFeedbackDraft(ws){const data={performance:document.getElementById('sub_performance').value,red_flags:document.getElementById('sub_red_flags').value,project_updates:document.getElementById('sub_project_updates').value,key_focus:document.getElementById('sub_key_focus').value};saveFeedbackSubmission(ws,data,'Draft');}
 
 async function saveFeedbackSubmission(ws,data,status){const owner=currentUser.display_name;const fb=feedbacks.find(f=>f.owner===owner&&f.week_start===ws);const payload={...data,owner,week_start:ws,status};if(fb){await sb.from('cx_standup_feedback').update(payload).eq('id',fb.id);}else{await sb.from('cx_standup_feedback').insert(payload);}await loadFeedback();renderFeedbackSubmissionForm();}
 
