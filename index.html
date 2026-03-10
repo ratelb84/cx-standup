@@ -537,9 +537,28 @@ let submissionWeekOffset=0;function renderFeedbackSubmissionForm(){
     document.getElementById('feedbackSubmissionForm').innerHTML=h;
 }
 
-function saveFeedbackDraft(ws){const data={performance:document.getElementById('sub_performance').value,red_flags:document.getElementById('sub_red_flags').value,project_updates:document.getElementById('sub_project_updates').value,key_focus:document.getElementById('sub_key_focus').value};saveFeedbackSubmission(ws,data,'Draft');}
+async function saveFeedbackDraft(ws){const data={performance:document.getElementById('sub_performance').value,red_flags:document.getElementById('sub_red_flags').value,project_updates:document.getElementById('sub_project_updates').value,key_focus:document.getElementById('sub_key_focus').value};await saveFeedbackSubmission(ws,data,'Draft');}
 
-async function saveFeedbackSubmission(ws,data,status){const owner=currentUser.display_name;const fb=feedbacks.find(f=>f.owner===owner&&f.week_start===ws);const payload={...data,owner,week_start:ws,status};if(fb){await sb.from('cx_standup_feedback').update(payload).eq('id',fb.id);}else{await sb.from('cx_standup_feedback').insert(payload);}await loadFeedback();renderFeedbackSubmissionForm();}
+async function saveFeedbackSubmission(ws,data,status){
+    const owner=currentUser.display_name;
+    const fb=feedbacks.find(f=>f.owner===owner&&f.week_start===ws);
+    const payload={...data,owner,week_start:ws,status};
+    try{
+        if(fb){
+            const {error}=await sb.from('cx_standup_feedback').update(payload).eq('id',fb.id);
+            if(error)throw error;
+        }else{
+            const {error}=await sb.from('cx_standup_feedback').insert([payload]);
+            if(error)throw error;
+        }
+        await loadFeedback();
+        renderFeedbackSubmissionForm();
+        alert(status==='Submitted'?'✅ Feedback submitted!':'📝 Draft saved!');
+    }catch(err){
+        console.error('Save error:',err);
+        alert('❌ Error saving feedback. Please try again.');
+    }
+}
 
 async function renderFeedbackHistory(){
     const ws=getWeekStart(historyWeekOffset);
