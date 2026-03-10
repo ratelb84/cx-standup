@@ -202,7 +202,7 @@
             <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Item Description</label><input type="text" id="f_item" class="input-field w-full" placeholder="What is the item?" required></div>
             <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Action</label><textarea id="f_action" class="input-field w-full" placeholder="What action needs to be taken?" required></textarea></div>
             <div class="grid grid-cols-3 gap-3 mb-3">
-                <div><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Priority</label><select id="f_priority" class="select-field w-full"><option value="High">🔴 High (This Week)</option><option value="Medium">🟡 Medium (Next 2 Weeks)</option><option value="Low">🔵 Low (This Month)</option></select></div>
+                <div><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Priority</label><select id="f_priority" class="select-field w-full"><option value="Urgent">🔴 Urgent</option><option value="High">🟠 High</option><option value="Medium">🟡 Medium</option><option value="Low">🔵 Low</option></select></div>
                 <div><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Status</label><select id="f_status" class="select-field w-full"><option value="Open">Open</option><option value="In Progress">In Progress</option><option value="Blocked">Blocked</option><option value="Done">Done</option></select></div>
                 <div><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Due Date</label><input type="date" id="f_dueDate" class="input-field w-full"></div>
             </div>
@@ -375,10 +375,10 @@ function renderDashboard(){
     const overdue=di.filter(i=>{if(!i.dueDate||i.status==='Done')return false;const d=new Date(i.dueDate+'T00:00:00');const n=new Date();n.setHours(0,0,0,0);return d<n;}).length;
     document.getElementById('dashStats').innerHTML='<div class="stat-card text-center" style="border-left:3px solid #6366f1;padding:8px 10px"><p class="text-[8px] font-medium text-gray-500 uppercase">Total</p><p class="text-lg font-bold text-indigo-600">'+total+'</p></div><div class="stat-card text-center" style="border-left:3px solid #9ca3af;padding:8px 10px"><p class="text-[8px] font-medium text-gray-500 uppercase">Open</p><p class="text-lg font-bold text-gray-600">'+open+'</p></div><div class="stat-card text-center" style="border-left:3px solid #f59e0b;padding:8px 10px"><p class="text-[8px] font-medium text-gray-500 uppercase">In Progress</p><p class="text-lg font-bold text-amber-600">'+inProg+'</p></div><div class="stat-card text-center" style="border-left:3px solid #ef4444;padding:8px 10px"><p class="text-[8px] font-medium text-gray-500 uppercase">Blocked</p><p class="text-lg font-bold text-red-600">'+blocked+'</p></div><div class="stat-card text-center" style="border-left:3px solid #dc2626;padding:8px 10px"><p class="text-[8px] font-medium text-gray-500 uppercase">Overdue</p><p class="text-lg font-bold text-red-700">'+overdue+'</p></div>';
     // Priority chart
-    const high=di.filter(i=>i.priority==='High').length;const med=di.filter(i=>i.priority==='Medium').length;const low=di.filter(i=>i.priority==='Low').length;
+    const urgent=di.filter(i=>i.priority==='Urgent').length;const high=di.filter(i=>i.priority==='High').length;const med=di.filter(i=>i.priority==='Medium').length;const low=di.filter(i=>i.priority==='Low').length;
     if(chartPriority)chartPriority.destroy();
     const ctxP=document.getElementById('chartPriority').getContext('2d');
-    chartPriority=new Chart(ctxP,{type:'doughnut',data:{labels:['High','Medium','Low'],datasets:[{data:[high,med,low],backgroundColor:['#ef4444','#f59e0b','#3b82f6'],borderWidth:0}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:10,family:'Poppins'},padding:8,boxWidth:10}}}}});
+    chartPriority=new Chart(ctxP,{type:'doughnut',data:{labels:['Urgent','High','Medium','Low'],datasets:[{data:[urgent,high,med,low],backgroundColor:['#7f1d1d','#ef4444','#f59e0b','#3b82f6'],borderWidth:0}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:9,family:'Poppins'},padding:6,boxWidth:10}}}}});
     // Status chart
     const sOpen=di.filter(i=>i.status==='Open').length;const sIP=di.filter(i=>i.status==='In Progress').length;const sBlk=di.filter(i=>i.status==='Blocked').length;const sDone=di.filter(i=>i.status==='Done').length;
     if(chartStatus)chartStatus.destroy();
@@ -452,7 +452,7 @@ function subscribeRealtime(){
 
 // BADGES
 function statusBadge(s){const m={Open:'badge-gray','In Progress':'badge-amber',Blocked:'badge-red',Done:'badge-green'};return '<span class="badge '+(m[s]||'badge-gray')+'">'+s+'</span>';}
-function priorityBadge(p){const m={High:'badge-red',Medium:'badge-amber',Low:'badge-blue'};const i={High:'🔴',Medium:'🟡',Low:'🔵'};return '<span class="badge '+m[p]+'">'+i[p]+' '+p+'</span>';}
+function priorityBadge(p){const m={Urgent:'badge-red',High:'badge-red',Medium:'badge-amber',Low:'badge-blue'};const i={Urgent:'🔴',High:'🟠',Medium:'🟡',Low:'🔵'};return '<span class="badge '+m[p]+'">'+i[p]+' '+p+'</span>';}
 function ownerBadge(o){const c=OWNER_COLORS[o]||'#6b7280';return '<span class="badge" style="background:'+c+'15;color:'+c+'">'+o+'</span>';}
 function dueBadge(d){if(!d)return '';const due=new Date(d+'T00:00:00');const now=new Date();now.setHours(0,0,0,0);const diff=Math.ceil((due-now)/(864e5));const label=due.toLocaleDateString('en-ZA',{day:'numeric',month:'short'});if(diff<0)return '<span class="due-badge due-overdue">⚠️ '+label+'</span>';if(diff<=3)return '<span class="due-badge due-soon">📅 '+label+'</span>';return '<span class="due-badge due-ok">📅 '+label+'</span>';}
 
