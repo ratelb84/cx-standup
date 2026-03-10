@@ -122,19 +122,17 @@
 
         <!-- DASHBOARD -->
         <div id="page-dashboard" class="p-6 hidden">
-            <div class="mb-4"><h1 class="text-lg font-bold text-gray-900" id="dashTitle">Dashboard</h1><p class="text-xs text-gray-500 mt-0.5" id="dashSubtitle">Your overview at a glance</p></div>
-            <div class="grid grid-cols-5 gap-3 mb-4" id="dashStats"></div>
-            <div class="grid grid-cols-2 gap-4 mb-4">
-                <div class="card"><div class="px-4 py-2 border-b border-gray-100"><span class="text-[10px] font-semibold uppercase tracking-wider text-gray-500">Items by Priority</span></div><div class="p-3"><canvas id="chartPriority" height="160"></canvas></div></div>
-                <div class="card"><div class="px-4 py-2 border-b border-gray-100"><span class="text-[10px] font-semibold uppercase tracking-wider text-gray-500">Items by Status</span></div><div class="p-3"><canvas id="chartStatus" height="160"></canvas></div></div>
+            <div class="mb-3"><h1 class="text-lg font-bold text-gray-900" id="dashTitle">Dashboard</h1><p class="text-xs text-gray-500 mt-0.5" id="dashSubtitle">Your overview at a glance</p></div>
+            <div class="grid grid-cols-5 gap-2 mb-3" id="dashStats"></div>
+            <div class="grid grid-cols-4 gap-3">
+                <div class="card"><div class="px-3 py-1.5 border-b border-gray-100"><span class="text-[9px] font-semibold uppercase tracking-wider text-gray-500">Items by Priority</span></div><div class="p-2"><canvas id="chartPriority" height="100"></canvas></div></div>
+                <div class="card"><div class="px-3 py-1.5 border-b border-gray-100"><span class="text-[9px] font-semibold uppercase tracking-wider text-gray-500">Items by Status</span></div><div class="p-2"><canvas id="chartStatus" height="100"></canvas></div></div>
+                <div class="card"><div class="px-3 py-1.5 border-b border-gray-100"><span class="text-[9px] font-semibold uppercase tracking-wider text-gray-500">⚠️ Overdue</span></div><div class="p-2 max-h-32 overflow-y-auto" id="dashOverdue"></div></div>
+                <div class="card"><div class="px-3 py-1.5 border-b border-gray-100"><span class="text-[9px] font-semibold uppercase tracking-wider text-gray-500">🔴 High Priority</span></div><div class="p-2 max-h-32 overflow-y-auto" id="dashHighPriority"></div></div>
             </div>
-            <div class="grid grid-cols-2 gap-4 mb-4" id="dashAdminCharts">
-                <div class="card"><div class="px-4 py-2 border-b border-gray-100"><span class="text-[10px] font-semibold uppercase tracking-wider text-gray-500">Items by Person</span></div><div class="p-3"><canvas id="chartPerson" height="200"></canvas></div></div>
-                <div class="card"><div class="px-4 py-2 border-b border-gray-100"><span class="text-[10px] font-semibold uppercase tracking-wider text-gray-500">Projects & Risks</span></div><div class="p-3"><canvas id="chartProjRisk" height="200"></canvas></div></div>
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-                <div class="card"><div class="px-4 py-2 border-b border-gray-100"><span class="text-[10px] font-semibold uppercase tracking-wider text-gray-500">⚠️ Overdue Items</span></div><div class="p-3" id="dashOverdue"></div></div>
-                <div class="card"><div class="px-4 py-2 border-b border-gray-100"><span class="text-[10px] font-semibold uppercase tracking-wider text-gray-500">🔴 High Priority Items</span></div><div class="p-3" id="dashHighPriority"></div></div>
+            <div class="grid grid-cols-2 gap-3 mt-3" id="dashAdminCharts" style="display:none">
+                <div class="card"><div class="px-3 py-1.5 border-b border-gray-100"><span class="text-[9px] font-semibold uppercase tracking-wider text-gray-500">Items by Person</span></div><div class="p-2"><canvas id="chartPerson" height="120"></canvas></div></div>
+                <div class="card"><div class="px-3 py-1.5 border-b border-gray-100"><span class="text-[9px] font-semibold uppercase tracking-wider text-gray-500">Projects & Risks</span></div><div class="p-2"><canvas id="chartProjRisk" height="120"></canvas></div></div>
             </div>
         </div>
 
@@ -376,7 +374,7 @@ function renderDashboard(){
     const inProg=di.filter(i=>i.status==='In Progress').length;
     const blocked=di.filter(i=>i.status==='Blocked').length;
     const overdue=di.filter(i=>{if(!i.dueDate||i.status==='Done')return false;const d=new Date(i.dueDate+'T00:00:00');const n=new Date();n.setHours(0,0,0,0);return d<n;}).length;
-    document.getElementById('dashStats').innerHTML='<div class="stat-card text-center" style="border-left:3px solid #6366f1;padding:10px 14px"><p class="text-[10px] font-medium text-gray-500 uppercase">Total</p><p class="text-xl font-bold text-indigo-600">'+total+'</p></div><div class="stat-card text-center" style="border-left:3px solid #9ca3af;padding:10px 14px"><p class="text-[10px] font-medium text-gray-500 uppercase">Open</p><p class="text-xl font-bold text-gray-600">'+open+'</p></div><div class="stat-card text-center" style="border-left:3px solid #f59e0b;padding:10px 14px"><p class="text-[10px] font-medium text-gray-500 uppercase">In Progress</p><p class="text-xl font-bold text-amber-600">'+inProg+'</p></div><div class="stat-card text-center" style="border-left:3px solid #ef4444;padding:10px 14px"><p class="text-[10px] font-medium text-gray-500 uppercase">Blocked</p><p class="text-xl font-bold text-red-600">'+blocked+'</p></div><div class="stat-card text-center" style="border-left:3px solid #dc2626;padding:10px 14px"><p class="text-[10px] font-medium text-gray-500 uppercase">Overdue</p><p class="text-xl font-bold text-red-700">'+overdue+'</p></div>';
+    document.getElementById('dashStats').innerHTML='<div class="stat-card text-center" style="border-left:3px solid #6366f1;padding:8px 10px"><p class="text-[8px] font-medium text-gray-500 uppercase">Total</p><p class="text-lg font-bold text-indigo-600">'+total+'</p></div><div class="stat-card text-center" style="border-left:3px solid #9ca3af;padding:8px 10px"><p class="text-[8px] font-medium text-gray-500 uppercase">Open</p><p class="text-lg font-bold text-gray-600">'+open+'</p></div><div class="stat-card text-center" style="border-left:3px solid #f59e0b;padding:8px 10px"><p class="text-[8px] font-medium text-gray-500 uppercase">In Progress</p><p class="text-lg font-bold text-amber-600">'+inProg+'</p></div><div class="stat-card text-center" style="border-left:3px solid #ef4444;padding:8px 10px"><p class="text-[8px] font-medium text-gray-500 uppercase">Blocked</p><p class="text-lg font-bold text-red-600">'+blocked+'</p></div><div class="stat-card text-center" style="border-left:3px solid #dc2626;padding:8px 10px"><p class="text-[8px] font-medium text-gray-500 uppercase">Overdue</p><p class="text-lg font-bold text-red-700">'+overdue+'</p></div>';
     // Priority chart
     const high=di.filter(i=>i.priority==='High').length;const med=di.filter(i=>i.priority==='Medium').length;const low=di.filter(i=>i.priority==='Low').length;
     if(chartPriority)chartPriority.destroy();
