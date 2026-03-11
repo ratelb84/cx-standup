@@ -110,6 +110,8 @@
             <div onclick="showPage('summary')" class="nav-item" id="nav-summary"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>Summary</div>
             <div class="nav-section">🤖 AI / Automation</div>
             <div onclick="showPage('projects')" class="nav-item" id="nav-projects"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"/></svg>Projects</div>
+            <div class="nav-section">📧 Notifications</div>
+            <div onclick="showPage('email-settings')" class="nav-item" id="nav-email-settings"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>Email Settings</div>
             <div class="nav-section">⚠️ Risk Register</div>
             <div onclick="showPage('risks')" class="nav-item" id="nav-risks"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>Risk Register</div>
 
@@ -190,6 +192,20 @@
             <div class="flex items-center justify-between mb-6"><div class="flex gap-3" id="adminStats"></div><button class="btn btn-accent text-xs" onclick="openUserModal()"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Add User</button></div>
             <div id="adminUsersList"></div>
         </div>
+        <!-- EMAIL SETTINGS -->
+        <div id="page-email-settings" class="p-8 hidden">
+            <div class="mb-6"><h1 class="text-2xl font-bold text-gray-900">📧 Email Notification Settings</h1><p class="text-sm text-gray-500 mt-1">Configure when and how email reminders are sent</p></div>
+            <div class="grid grid-cols-3 gap-4 mb-6" id="emailStats"></div>
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-gray-800">Reminder Rules</h2>
+                <button class="btn btn-accent text-xs" onclick="openReminderModal()"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Add Rule</button>
+            </div>
+            <div id="reminderRulesList"></div>
+            <div class="mt-8">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">Recent Emails Sent</h2>
+                <div id="recentEmailsList"></div>
+            </div>
+        </div>
     </main>
 </div></div>
 <!-- ACTION ITEM MODAL -->
@@ -261,6 +277,8 @@
         <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Display Name *</label><input type="text" id="u_name" class="input-field w-full" placeholder="e.g. Sarah"></div>
         <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Username *</label><input type="text" id="u_username" class="input-field w-full" placeholder="e.g. sarah (lowercase)"></div>
         <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Password *</label><input type="text" id="u_password" class="input-field w-full" placeholder="e.g. Sarah123!"></div>
+        <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Email</label><input type="email" id="u_email" class="input-field w-full" placeholder="e.g. sarah@company.com"></div>
+        <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Phone</label><input type="tel" id="u_phone" class="input-field w-full" placeholder="e.g. +27 82 123 4567"></div>
         <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Color</label><input type="color" id="u_color" class="input-field w-full" value="#6366f1" style="height:38px;padding:4px"></div>
         <button type="button" class="btn btn-accent w-full justify-center" onclick="saveUser()"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span id="userSubmitText">Add User</span></button>
     </div></div>
@@ -278,6 +296,37 @@
         <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Owner(s) *</label><div id="r_owners" class="flex flex-wrap gap-2"></div></div>
         <div class="mb-3" id="riskCommentsSection" style="display:none"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Comments</label><div id="riskCommentsList" class="comment-list"></div><div class="comment-add"><input type="text" id="r_newComment" class="input-field flex-1" placeholder="Add a comment..." onkeydown="if(event.key==='Enter'){event.preventDefault();addRiskComment();}"><button type="button" class="btn btn-accent text-xs" onclick="addRiskComment()" style="padding:7px 12px">Add</button></div></div>
         <button type="button" class="btn btn-accent w-full justify-center" onclick="saveRisk()"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span id="riskSubmitText">Add Risk</span></button>
+    </div></div>
+</div>
+<!-- REMINDER RULE MODAL -->
+<div id="reminderModal" class="fixed inset-0 z-50 hidden" onclick="if(event.target===this)closeReminderModal()">
+    <div class="absolute inset-0 bg-black/30"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md"><div class="card p-6">
+        <div class="flex items-center justify-between mb-4"><h3 class="text-base font-semibold text-gray-900" id="reminderModalTitle">Add Reminder Rule</h3><button class="btn-danger" onclick="closeReminderModal()"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div>
+        <input type="hidden" id="rem_id">
+        <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Rule Name *</label><input type="text" id="rem_name" class="input-field w-full" placeholder="e.g. 1 Day Before Due"></div>
+        <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Reminder Type *</label>
+            <select id="rem_type" class="select-field w-full" onchange="toggleReminderFields()">
+                <option value="on_assignment">On Assignment (immediate)</option>
+                <option value="days_before_due">Days Before Due Date</option>
+                <option value="days_before_meeting">Days Before Meeting</option>
+                <option value="custom_interval">Custom Interval (every X days)</option>
+            </select>
+        </div>
+        <div class="mb-3" id="rem_value_row"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Days *</label><input type="number" id="rem_value" class="input-field w-full" placeholder="e.g. 1" min="0" value="1"></div>
+        <div class="mb-3 hidden" id="rem_meeting_row"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Meeting Day</label>
+            <select id="rem_meeting_day" class="select-field w-full">
+                <option value="Monday">Monday</option>
+                <option value="Tuesday" selected>Tuesday</option>
+                <option value="Wednesday">Wednesday</option>
+                <option value="Thursday">Thursday</option>
+                <option value="Friday">Friday</option>
+            </select>
+        </div>
+        <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Email Subject Template</label><input type="text" id="rem_subject" class="input-field w-full" placeholder="e.g. Reminder: {title} is due soon"></div>
+        <div class="mb-3"><label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Email Body Template</label><textarea id="rem_body" class="input-field w-full" rows="3" placeholder="Use {title}, {due_date}, {owner}, {status}, {link}"></textarea></div>
+        <div class="mb-4 flex items-center gap-2"><input type="checkbox" id="rem_enabled" checked><label for="rem_enabled" class="text-xs text-gray-600">Enabled</label></div>
+        <button type="button" class="btn btn-accent w-full justify-center" onclick="saveReminder()"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span id="reminderSubmitText">Add Rule</span></button>
     </div></div>
 </div>
 <script>
@@ -427,7 +476,7 @@ function renderAdminUsers(){
         h+='<div class="flex items-center justify-between"><div class="flex items-center gap-3">';
         h+='<div class="h-8 w-8 rounded-full flex items-center justify-center text-white text-xs font-semibold" style="background:'+col+'">'+dn.charAt(0)+'</div>';
         h+='<div><div class="text-sm font-semibold text-gray-900">'+dn+(isAdm?' <span class="badge badge-purple text-[9px]">Admin</span>':'')+(isDisabled?' <span class="badge badge-red text-[9px]">Disabled</span>':'')+'</div>';
-        h+='<div class="text-xs text-gray-500">@'+u.username+' &middot; '+u.password+'</div></div></div>';
+        h+='<div class="text-xs text-gray-500">@'+u.username+(u.email?' &middot; 📧 '+u.email:'')+(u.phone?' &middot; 📱 '+u.phone:'')+'</div></div></div>';
         h+='<div class="flex items-center gap-2">';
         h+='<button class="btn text-xs" style="background:#f3f4f6;color:#374151;padding:5px 10px" onclick="openEditUser(\''+u.username+'\')">Edit</button>';
         if(!isDisabled)h+='<button class="btn text-xs" style="background:#fef2f2;color:#dc2626;padding:5px 10px" onclick="toggleUserEnabled(\''+u.username+'\',false)">Disable</button>';
@@ -438,8 +487,8 @@ function renderAdminUsers(){
     h+='</div>';
     el.innerHTML=h;
 }
-function openUserModal(){document.getElementById('u_editing').value='';document.getElementById('u_name').value='';document.getElementById('u_username').value='';document.getElementById('u_username').disabled=false;document.getElementById('u_password').value='';document.getElementById('u_color').value='#6366f1';document.getElementById('userModalTitle').textContent='Add User';document.getElementById('userSubmitText').textContent='Add User';document.getElementById('userModal').classList.remove('hidden');document.getElementById('u_name').focus();}
-function openEditUser(username){const u=allUsers.find(x=>x.username===username);if(!u)return;document.getElementById('u_editing').value=username;document.getElementById('u_name').value=u.display_name;document.getElementById('u_username').value=u.username;document.getElementById('u_username').disabled=true;document.getElementById('u_password').value=u.password;document.getElementById('u_color').value=u.color||'#6366f1';document.getElementById('userModalTitle').textContent='Edit User';document.getElementById('userSubmitText').textContent='Save Changes';document.getElementById('userModal').classList.remove('hidden');}
+function openUserModal(){document.getElementById('u_editing').value='';document.getElementById('u_name').value='';document.getElementById('u_username').value='';document.getElementById('u_username').disabled=false;document.getElementById('u_password').value='';document.getElementById('u_email').value='';document.getElementById('u_phone').value='';document.getElementById('u_color').value='#6366f1';document.getElementById('userModalTitle').textContent='Add User';document.getElementById('userSubmitText').textContent='Add User';document.getElementById('userModal').classList.remove('hidden');document.getElementById('u_name').focus();}
+function openEditUser(username){const u=allUsers.find(x=>x.username===username);if(!u)return;document.getElementById('u_editing').value=username;document.getElementById('u_name').value=u.display_name;document.getElementById('u_username').value=u.username;document.getElementById('u_username').disabled=true;document.getElementById('u_password').value=u.password;document.getElementById('u_email').value=u.email||'';document.getElementById('u_phone').value=u.phone||'';document.getElementById('u_color').value=u.color||'#6366f1';document.getElementById('userModalTitle').textContent='Edit User';document.getElementById('userSubmitText').textContent='Save Changes';document.getElementById('userModal').classList.remove('hidden');}
 function closeUserModal(){document.getElementById('userModal').classList.add('hidden');}
 async function saveUser(){
     try{
@@ -447,20 +496,24 @@ async function saveUser(){
         const name=document.getElementById('u_name').value.trim();
         const username=document.getElementById('u_username').value.trim().toLowerCase();
         const password=document.getElementById('u_password').value;
+        const email=document.getElementById('u_email').value.trim();
+        const phone=document.getElementById('u_phone').value.trim();
         const color=document.getElementById('u_color').value;
         if(!name||!username||!password){alert('Please fill in all fields');return;}
         if(editing){
-            const {error}=await sb.from('cx_standup_users').update({display_name:name,password:password,color:color}).eq('username',editing);
+            const {error}=await sb.from('cx_standup_users').update({display_name:name,password:password,email:email||null,phone:phone||null,color:color}).eq('username',editing);
             if(error){alert('Error saving: '+error.message);return;}
             if(currentUser.username===editing){
                 currentUser.display_name=name;
                 currentUser.color=color;
+                currentUser.email=email;
+                currentUser.phone=phone;
                 document.getElementById('userAvatar').style.background=color;
                 document.getElementById('userAvatar').textContent=name[0];
                 document.getElementById('userName').textContent=name;
             }
         }else{
-            const {error}=await sb.from('cx_standup_users').insert({username:username,display_name:name,password:password,color:color,enabled:true,is_admin:false});
+            const {error}=await sb.from('cx_standup_users').insert({username:username,display_name:name,password:password,email:email||null,phone:phone||null,color:color,enabled:true,is_admin:false});
             if(error){alert('Error: '+error.message);return;}
         }
         alert('✅ User saved!');
@@ -643,26 +696,170 @@ function showPage(page){
     currentPage=page;
     document.querySelectorAll('[id^="page-"]').forEach(p=>p.classList.add('hidden'));
     document.getElementById('page-'+page).classList.remove('hidden');
-    ['dashboard','feedback-submission','feedback-history','board','list','people','summary','projects','risks','admin'].forEach(n=>{const el=document.getElementById('nav-'+n);if(el)el.classList.remove('active');});
+    ['dashboard','feedback-submission','feedback-history','board','list','people','summary','projects','risks','admin','email-settings'].forEach(n=>{const el=document.getElementById('nav-'+n);if(el)el.classList.remove('active');});
     const navEl=document.getElementById('nav-'+page);if(navEl)navEl.classList.add('active');
     const isFb=page==='feedback-submission'||page==='feedback-history';
     const isPR=page==='projects'||page==='risks';
     const isDash=page==='dashboard';
     const isAdmin=page==='admin';
-    document.getElementById('topAddBtn').style.display=(isFb||isPR||isDash||isAdmin)?'none':'inline-flex';
-    document.getElementById('topBarTitle').textContent=isDash?'Dashboard':page==='feedback-submission'?'Weekly Submission':page==='feedback-history'?'Weekly Status':isPR?(page==='projects'?'AI / Automation Projects':'Risk Register'):isAdmin?'User Management':'Action Items';
+    const isEmail=page==='email-settings';
+    document.getElementById('topAddBtn').style.display=(isFb||isPR||isDash||isAdmin||isEmail)?'none':'inline-flex';
+    document.getElementById('topBarTitle').textContent=isDash?'Dashboard':page==='feedback-submission'?'Weekly Submission':page==='feedback-history'?'Weekly Status':isPR?(page==='projects'?'AI / Automation Projects':'Risk Register'):isAdmin?'User Management':isEmail?'Email Settings':'Action Items';
     if(page==='dashboard'){renderDashboard();}
     else if(page==='feedback-submission'){renderFeedbackSubmissionForm();}
     else if(page==='feedback-history'){renderFeedbackHistory();}
     else if(page==='projects'){loadProjects();}
     else if(page==='risks'){loadRisks();}
     else if(page==='admin'){if(currentUser&&currentUser.is_admin)loadAllUsers();}
+    else if(page==='email-settings'){loadEmailSettings();}
     else{renderAll();}
 }
 function setOwnerFilter(owner){currentOwnerFilter=owner;document.querySelectorAll('.nav-item').forEach(n=>{if(n.id.startsWith('nav-')&&!['nav-feedback','nav-feedback-history','nav-board','nav-list','nav-people','nav-summary'].includes(n.id))n.classList.remove('active');});document.getElementById('nav-'+(owner==='all'?'all':owner)).classList.add('active');renderAll();}
 function renderAll(){renderSummaryCards();if(currentPage==='board')renderBoard();if(currentPage==='list')renderList();if(currentPage==='people')renderPeople();if(currentPage==='summary')renderSummary();}
 
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeFbModal();closeProjModal();closeRiskModal();closeUserModal();}if(e.key==='n'&&!e.ctrlKey&&!e.metaKey&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName))openAddModal();});
+// ==================== EMAIL SETTINGS ====================
+let reminderRules=[];
+let sentEmails=[];
+
+async function loadEmailSettings(){
+    const{data:rules}=await sb.from('cx_email_reminder_config').select('*').order('created_at',{ascending:true});
+    reminderRules=rules||[];
+    const{data:sent}=await sb.from('cx_reminder_emails_sent').select('*').order('sent_at',{ascending:false}).limit(20);
+    sentEmails=sent||[];
+    renderEmailSettings();
+}
+
+function renderEmailSettings(){
+    // Stats
+    const active=reminderRules.filter(r=>r.enabled).length;
+    const inactive=reminderRules.filter(r=>!r.enabled).length;
+    const totalSent=sentEmails.length;
+    document.getElementById('emailStats').innerHTML=
+        '<div class="stat-card text-center" style="border-left:4px solid #10b981"><p class="text-xs font-medium text-gray-500 uppercase">Active Rules</p><p class="text-2xl font-bold text-green-600 mt-1">'+active+'</p></div>'+
+        '<div class="stat-card text-center" style="border-left:4px solid #9ca3af"><p class="text-xs font-medium text-gray-500 uppercase">Inactive</p><p class="text-2xl font-bold text-gray-600 mt-1">'+inactive+'</p></div>'+
+        '<div class="stat-card text-center" style="border-left:4px solid #6366f1"><p class="text-xs font-medium text-gray-500 uppercase">Emails Sent</p><p class="text-2xl font-bold text-indigo-600 mt-1">'+totalSent+'</p></div>';
+
+    // Rules list
+    if(!reminderRules.length){
+        document.getElementById('reminderRulesList').innerHTML='<div class="card p-12 text-center text-gray-400 text-sm">No reminder rules configured. Click Add Rule to get started.</div>';
+    }else{
+        const typeLabels={on_assignment:'📬 On Assignment',days_before_due:'📅 Days Before Due',days_before_meeting:'🗓️ Days Before Meeting',custom_interval:'🔄 Custom Interval'};
+        const typeColors={on_assignment:'#6366f1',days_before_due:'#f59e0b',days_before_meeting:'#10b981',custom_interval:'#8b5cf6'};
+        let h='<div class="space-y-3">';
+        reminderRules.forEach(r=>{
+            const typeLabel=typeLabels[r.reminder_type]||r.reminder_type;
+            const typeColor=typeColors[r.reminder_type]||'#6b7280';
+            const valueText=r.reminder_type==='on_assignment'?'Immediately when assigned':
+                r.reminder_type==='days_before_due'?r.reminder_value+' day(s) before due date':
+                r.reminder_type==='days_before_meeting'?r.reminder_value+' day(s) before '+r.meeting_day+' meeting':
+                'Every '+r.reminder_value+' day(s)';
+            h+='<div class="card p-5'+(r.enabled?'':' opacity-50')+'" style="border-left:4px solid '+typeColor+'">';
+            h+='<div class="flex items-center justify-between"><div class="flex-1">';
+            h+='<div class="text-sm font-semibold text-gray-900">'+r.reminder_name+'</div>';
+            h+='<div class="text-xs text-gray-500 mt-1">'+typeLabel+' — '+valueText+'</div>';
+            if(r.email_subject_template)h+='<div class="text-xs text-indigo-600 mt-1">📧 '+r.email_subject_template+'</div>';
+            h+='</div><div class="flex items-center gap-2">';
+            h+='<span class="badge '+(r.enabled?'badge-green':'badge-gray')+'">'+(r.enabled?'Active':'Disabled')+'</span>';
+            h+='<button class="btn text-xs" style="background:#f3f4f6;color:#374151;padding:5px 10px" onclick="openEditReminder(\''+r.id+'\')">Edit</button>';
+            h+='<button class="btn text-xs" style="background:'+(r.enabled?'#fef2f2':'#ecfdf5')+';color:'+(r.enabled?'#dc2626':'#059669')+';padding:5px 10px" onclick="toggleReminder(\''+r.id+'\','+!r.enabled+')">'+(r.enabled?'Disable':'Enable')+'</button>';
+            h+='<button class="btn-danger text-xs" onclick="deleteReminder(\''+r.id+'\')"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>';
+            h+='</div></div></div>';
+        });
+        h+='</div>';
+        document.getElementById('reminderRulesList').innerHTML=h;
+    }
+
+    // Recent emails
+    if(!sentEmails.length){
+        document.getElementById('recentEmailsList').innerHTML='<div class="card p-8 text-center text-gray-400 text-sm">No emails sent yet. Emails will appear here when reminders fire.</div>';
+    }else{
+        let eh='<div class="space-y-2">';
+        sentEmails.forEach(e=>{
+            const d=new Date(e.sent_at);
+            const ds=d.toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'})+' '+d.toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'});
+            eh+='<div class="card p-3"><div class="flex items-center justify-between"><div class="text-xs"><span class="font-semibold text-gray-800">'+e.email_to+'</span> — <span class="text-gray-500">'+e.username+'</span></div><div class="flex items-center gap-2"><span class="badge '+(e.status==='sent'?'badge-green':'badge-red')+'">'+e.status+'</span><span class="text-[10px] text-gray-400">'+ds+'</span></div></div></div>';
+        });
+        eh+='</div>';
+        document.getElementById('recentEmailsList').innerHTML=eh;
+    }
+}
+
+function toggleReminderFields(){
+    const type=document.getElementById('rem_type').value;
+    document.getElementById('rem_value_row').classList.toggle('hidden',type==='on_assignment');
+    document.getElementById('rem_meeting_row').classList.toggle('hidden',type!=='days_before_meeting');
+}
+
+function openReminderModal(){
+    document.getElementById('rem_id').value='';
+    document.getElementById('rem_name').value='';
+    document.getElementById('rem_type').value='days_before_due';
+    document.getElementById('rem_value').value='1';
+    document.getElementById('rem_meeting_day').value='Tuesday';
+    document.getElementById('rem_subject').value='';
+    document.getElementById('rem_body').value='';
+    document.getElementById('rem_enabled').checked=true;
+    toggleReminderFields();
+    document.getElementById('reminderModalTitle').textContent='Add Reminder Rule';
+    document.getElementById('reminderSubmitText').textContent='Add Rule';
+    document.getElementById('reminderModal').classList.remove('hidden');
+    document.getElementById('rem_name').focus();
+}
+
+function openEditReminder(id){
+    const r=reminderRules.find(x=>x.id===id);
+    if(!r)return;
+    document.getElementById('rem_id').value=r.id;
+    document.getElementById('rem_name').value=r.reminder_name;
+    document.getElementById('rem_type').value=r.reminder_type;
+    document.getElementById('rem_value').value=r.reminder_value||1;
+    document.getElementById('rem_meeting_day').value=r.meeting_day||'Tuesday';
+    document.getElementById('rem_subject').value=r.email_subject_template||'';
+    document.getElementById('rem_body').value=r.email_body_template||'';
+    document.getElementById('rem_enabled').checked=r.enabled;
+    toggleReminderFields();
+    document.getElementById('reminderModalTitle').textContent='Edit Reminder Rule';
+    document.getElementById('reminderSubmitText').textContent='Save Changes';
+    document.getElementById('reminderModal').classList.remove('hidden');
+}
+
+function closeReminderModal(){document.getElementById('reminderModal').classList.add('hidden');}
+
+async function saveReminder(){
+    const name=document.getElementById('rem_name').value.trim();
+    if(!name){alert('Please enter a rule name');return;}
+    const id=document.getElementById('rem_id').value||undefined;
+    const row={
+        reminder_name:name,
+        reminder_type:document.getElementById('rem_type').value,
+        reminder_value:parseInt(document.getElementById('rem_value').value)||0,
+        meeting_day:document.getElementById('rem_type').value==='days_before_meeting'?document.getElementById('rem_meeting_day').value:null,
+        enabled:document.getElementById('rem_enabled').checked,
+        email_subject_template:document.getElementById('rem_subject').value||null,
+        email_body_template:document.getElementById('rem_body').value||null,
+        updated_at:new Date().toISOString()
+    };
+    if(id){row.id=id;await sb.from('cx_email_reminder_config').update(row).eq('id',id);}
+    else{await sb.from('cx_email_reminder_config').insert(row);}
+    closeReminderModal();
+    loadEmailSettings();
+}
+
+async function toggleReminder(id,enabled){
+    await sb.from('cx_email_reminder_config').update({enabled:enabled,updated_at:new Date().toISOString()}).eq('id',id);
+    loadEmailSettings();
+}
+
+async function deleteReminder(id){
+    if(!confirm('Delete this reminder rule?'))return;
+    await sb.from('cx_email_reminder_config').delete().eq('id',id);
+    loadEmailSettings();
+}
+
+// Subscribe to email config changes
+sb.channel('cx_email_changes').on('postgres_changes',{event:'*',schema:'public',table:'cx_email_reminder_config'},()=>{if(currentPage==='email-settings')loadEmailSettings();}).subscribe();
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeFbModal();closeProjModal();closeRiskModal();closeUserModal();closeReminderModal();}if(e.key==='n'&&!e.ctrlKey&&!e.metaKey&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName))openAddModal();});
 subscribeRealtime();checkSession();
 </script>
 </body></html>
